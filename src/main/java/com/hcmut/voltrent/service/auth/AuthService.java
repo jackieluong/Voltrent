@@ -1,0 +1,101 @@
+package com.hcmut.voltrent.service.auth;
+
+import com.hcmut.voltrent.constant.Role;
+import com.hcmut.voltrent.constant.TokenType;
+import com.hcmut.voltrent.dtos.LoginRequest;
+import com.hcmut.voltrent.dtos.LoginResponse;
+import com.hcmut.voltrent.dtos.RegisterRequest;
+import com.hcmut.voltrent.dtos.UserDto;
+import com.hcmut.voltrent.entity.User;
+import com.hcmut.voltrent.repository.UserRepository;
+import com.hcmut.voltrent.security.JwtUtil;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.Optional;
+
+@Service
+@Slf4j
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager ;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public AuthService(UserRepository userRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
+    }
+    public LoginResponse login(LoginRequest loginRequest) {
+
+        User user = Optional.ofNullable(userRepository.findByEmail(loginRequest.getEmail()))
+                .map(u -> {
+                    if (!passwordEncoder.matches(loginRequest.getPassword(), u.getPassword())) {
+                        log.error("Invalid password for user with email: {}", loginRequest.getEmail());
+                        throw new BadCredentialsException("Invalid email or password");
+                    }
+                    return u;
+                })
+                .orElseThrow(() -> {
+                    log.error("No user found with email: {}", loginRequest.getEmail());
+                    return new BadCredentialsException("Invalid email or password");
+                });
+
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(), loginRequest.getPassword());
+        Authentication authentication = authenticationManager.authenticate(token);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = jwtUtil.generateAccessToken(authentication.getName(), Map.of("role", user.getRole()));
+        String refreshToken = jwtUtil.generateRefreshToken(authentication.getName(), Map.of("role", user.getRole()));
+
+        log.info("Login successfully for user with email: {}", loginRequest.getEmail());
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType(TokenType.BEARER.getValue())
+                .user(new LoginResponse.UserDto(user.getEmail(), user.getFullname(), user.getPhone(), user.getRole()))
+                .build();
+    }
+
+    public UserDto register(RegisterRequest registerRequest){
+        Optional.ofNullable(userRepository.findByEmail(registerRequest.getEmail()))
+                .ifPresent(user -> {
+                    log.error("Email already exists: {}", registerRequest.getEmail());
+                    throw new IllegalArgumentException("Email already exists");
+                });
+
+
+        User user = User.builder()
+                .email(registerRequest.getEmail())
+                .phone(registerRequest.getPhone())
+                .fullname(registerRequest.getFullname())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(Role.USER)
+                .build();
+
+        userRepository.save(user);
+
+        log.info("Register successfully for user with email: {}", registerRequest.getEmail());
+        return modelMapper.map(user, UserDto.class);
+    }
+
+}
