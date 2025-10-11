@@ -2,14 +2,13 @@ package com.hcmut.voltrent.service.auth;
 
 import com.hcmut.voltrent.constant.Role;
 import com.hcmut.voltrent.constant.TokenType;
-import com.hcmut.voltrent.dtos.LoginRequest;
-import com.hcmut.voltrent.dtos.LoginResponse;
-import com.hcmut.voltrent.dtos.RegisterRequest;
+import com.hcmut.voltrent.dtos.request.LoginRequest;
+import com.hcmut.voltrent.dtos.response.LoginResponse;
+import com.hcmut.voltrent.dtos.request.RegisterRequest;
 import com.hcmut.voltrent.dtos.UserDto;
 import com.hcmut.voltrent.entity.User;
 import com.hcmut.voltrent.repository.UserRepository;
 import com.hcmut.voltrent.security.JwtUtil;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,10 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
     }
+
     public LoginResponse login(LoginRequest loginRequest) {
 
-        User user = Optional.ofNullable(userRepository.findByEmail(loginRequest.getEmail()))
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .map(u -> {
                     if (!passwordEncoder.matches(loginRequest.getPassword(), u.getPassword())) {
                         log.error("Invalid password for user with email: {}", loginRequest.getEmail());
@@ -57,15 +57,16 @@ public class AuthService {
                     return new BadCredentialsException("Invalid email or password");
                 });
 
-
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 loginRequest.getEmail(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(token);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String accessToken = jwtUtil.generateAccessToken(authentication.getName(), Map.of("role", user.getRole()));
-        String refreshToken = jwtUtil.generateRefreshToken(authentication.getName(), Map.of("role", user.getRole()));
+        String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getId()),
+                Map.of("role", user.getRole()));
+        String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getId()),
+                Map.of("role", user.getRole()));
 
         log.info("Login successfully for user with email: {}", loginRequest.getEmail());
         return LoginResponse.builder()

@@ -1,4 +1,4 @@
-package com.hcmut.voltrent.dtos;
+package com.hcmut.voltrent.dtos.request;
 
 
 import jakarta.validation.constraints.Email;

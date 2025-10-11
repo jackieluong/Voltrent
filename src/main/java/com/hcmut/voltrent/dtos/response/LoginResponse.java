@@ -1,4 +1,4 @@
-package com.hcmut.voltrent.dtos;
+package com.hcmut.voltrent.dtos.response;
 
 import com.hcmut.voltrent.constant.Role;
 import lombok.AllArgsConstructor;

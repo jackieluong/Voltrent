@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -40,6 +42,9 @@ public class JwtUtil {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration * 1000);
 
+        if (claims == null) {
+            claims = Collections.emptyMap();
+        }
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
