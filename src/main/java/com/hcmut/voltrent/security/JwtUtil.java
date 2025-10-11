@@ -20,9 +20,9 @@ public class JwtUtil {
 
     @Value("${app.jwt.secret}")
     private String secretKeyString;
-    @Value("${app.jwt.accessTokenExpiration}")
+    @Value("${app.jwt.access-token-expiration}")
     private long accessTokenExpiration;
-    @Value("${app.jwt.refreshTokenExpiration}")
+    @Value("${app.jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
     // -------------------------------
