@@ -64,7 +64,8 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getId()),
-                Map.of("role", user.getRole()));
+                Map.of("role", user.getRole(), "email", user.getEmail())
+        );
         String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getId()),
                 Map.of("role", user.getRole()));
 

@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  voltrent-service:
+    image: manhtiennn/voltrent:latest
+    container_name: voltrent-main-svc
+    restart: always
+
+    ports:
+      - "8080:8080"
+

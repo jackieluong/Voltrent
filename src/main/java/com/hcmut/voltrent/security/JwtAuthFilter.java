@@ -56,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String userId = claims.getSubject();
                 String email = claims.get("email", String.class);
 
-                if (userId == null || email == null) {
+                if (userId == null && email == null) {
                     log.warn("JWT token is missing subject or email");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("Invalid token: missing subject or email");

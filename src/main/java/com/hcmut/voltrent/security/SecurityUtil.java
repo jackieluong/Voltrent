@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class SecurityUtil {
@@ -28,6 +29,10 @@ public class SecurityUtil {
             return springSecurityUser.getUsername();
         } else if (authentication.getPrincipal() instanceof String s) {
             return s;
+        } else if(authentication.getPrincipal() instanceof Map){
+
+            Map<String, String> principal = (Map<String, String>) authentication.getPrincipal();
+            return principal.get("userId");
         }
         return null;
     }
