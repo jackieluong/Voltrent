@@ -42,6 +42,8 @@ public class BookingService implements IBookingService{
                 .vehicleId(request.getVehicleId())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
+                .status(BookingStatus.PENDING_PAYMENT.getValue())
+                .totalAmount(request.getTotalAmount())
                 .build();
 
         try{

@@ -32,7 +32,7 @@ public class Booking extends BaseEntity{
     private String endTime;
 
     @Column(name = "total_amount")
-    private int totalAmount;
+    private double totalAmount;
 
     private String status;
 
