@@ -16,11 +16,20 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  messages:
+    encoding: UTF-8
 app:
   jwt:
     secret: 089669ad208ee725fe7a17cadb825bcd1f924f73c022bbbc
     access-token-expiration: 6500
     refresh-token-expiration: 10000
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 logging:
   level:
@@ -28,8 +37,8 @@ logging:
 
 payment:
   vnpay:
-    tmn-code: X5AL5D3N
-    secret-key: 50NE93Q8ATV8MPHQG7O4QTDI1EZ803GR
+    tmn-code: 9C79VGSE
+    secret-key: KCF9NKM1WT1BMXAFQ3GD69OT1K2V2SA2
     init-payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
     return-url: https://dev.payment.com/order/%s/status
     timeout: 15 # in minutes

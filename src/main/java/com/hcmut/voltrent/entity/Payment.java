@@ -9,6 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@ToString
 @Table(name = "payments")
 public class Payment extends BaseEntity{
 
@@ -26,6 +27,8 @@ public class Payment extends BaseEntity{
 
     @Column(name = "transaction_ref")
     private String transactionRef;
+
+    private String partnerPayDate;
 
     @PrePersist
     public void prePersist() {

@@ -1,6 +1,7 @@
 package com.hcmut.voltrent.service.booking;
 
 import com.hcmut.voltrent.constant.BookingStatus;
+import com.hcmut.voltrent.constant.PaymentGateway;
 import com.hcmut.voltrent.dtos.request.CreateBookingRequest;
 import com.hcmut.voltrent.dtos.response.CreateBookingResponse;
 import com.hcmut.voltrent.entity.Booking;
@@ -11,6 +12,8 @@ import com.hcmut.voltrent.security.SecurityUtil;
 import com.hcmut.voltrent.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -52,6 +55,23 @@ public class BookingService implements IBookingService{
         } catch (Exception e) {
             log.error("Error saving booking {}", newBooking, e);
             throw new RuntimeException("Error creating new booking");
+        }
+
+    }
+
+    @Override
+    public void markBookingAsPaid(Long bookingId, PaymentGateway paymentMethod) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.setStatus(BookingStatus.CONFIRMED.getValue());
+        booking.setPaymentCompletedTime(LocalDateTime.now());
+
+        try {
+            bookingRepository.save(booking);
+        } catch (Exception e) {
+            log.error("Error updating booking {}", booking, e);
+            throw new RuntimeException(e);
         }
 
     }

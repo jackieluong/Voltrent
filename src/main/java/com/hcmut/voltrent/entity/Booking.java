@@ -34,6 +34,9 @@ public class Booking extends BaseEntity{
     @Column(name = "total_amount")
     private int totalAmount;
 
+    private String status;
+
+    private LocalDateTime paymentCompletedTime;
 
 
 }

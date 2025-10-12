@@ -9,9 +9,11 @@ import com.hcmut.voltrent.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Slf4j
 @Service
-public class PaymentService {
+public class PaymentService implements IPaymentService {
 
     private final VNPayStrategy vnPayStrategy;
     private final PaymentRepository paymentRepository;
@@ -43,19 +45,36 @@ public class PaymentService {
 
     }
 
+    @Override
+    public Object processIpn(PaymentGateway paymentGateway, Map<String, String> params) {
+        log.info("[Payment Ipn] gateway: {}, params: {}", paymentGateway, params);
+
+        PaymentStrategy paymentStrategy = this.getPaymentStrategy(paymentGateway);
+
+        Object ipnResponse = paymentStrategy.processIPN(params);
+        SavePaymentRequest savePaymentRequest = paymentStrategy.buildSavePaymentRequest(params);
+
+        this.savePayment(savePaymentRequest);
+        return ipnResponse;
+    }
+
+
     public void savePayment(SavePaymentRequest paymentRequest) {
 
         Payment payment = Payment.builder()
                 .gateway(paymentRequest.getGateway().getValue())
                 .bookingId(paymentRequest.getBookingId())
                 .totalAmount((long) paymentRequest.getTotalAmount())
-                .status(paymentRequest.getPaymentStatus())
+                .transactionRef(paymentRequest.getTransactionId())
+                .status(paymentRequest.getPaymentStatus().getDescription())
+                .partnerPayDate(paymentRequest.getPartnerPayDate())
                 .build();
         try{
+            log.info("Saving payment {}", payment);
             paymentRepository.save(payment);
         } catch (Exception e) {
             log.error("Error saving payment {}", payment, e);
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
     }
 
