@@ -49,7 +49,7 @@ public class BookingService implements IBookingService{
             return CreateBookingResponse.builder()
                     .bookingId(String.valueOf(saved.getId()))
                     .vehicleId(String.valueOf(saved.getVehicleId()))
-                    .totalAmount(10000L)
+                    .totalAmount(request.getTotalAmount())
                     .status(BookingStatus.PENDING_PAYMENT.getValue())
                     .build();
         } catch (Exception e) {

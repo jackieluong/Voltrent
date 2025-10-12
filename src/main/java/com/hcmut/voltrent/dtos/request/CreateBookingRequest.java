@@ -20,4 +20,7 @@ public class CreateBookingRequest {
     @NotEmpty(message = "End time cannot be empty")
     @JsonProperty("end_time")
     private String endTime;
+
+    @JsonProperty("total_amount")
+    private Long totalAmount;
 }
