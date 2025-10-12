@@ -17,12 +17,10 @@ import org.springframework.stereotype.Service;
 public class BookingService implements IBookingService{
 
     private final BookingRepository bookingRepository;
-    private final JwtUtil  jwtUtil;
 
 
-    public BookingService(BookingRepository bookingRepository, JwtUtil jwtUtil) {
+    public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
-        this.jwtUtil = jwtUtil;
     }
 
     @Override

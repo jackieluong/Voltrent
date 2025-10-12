@@ -93,10 +93,15 @@ public class AuthService {
                 .role(Role.USER)
                 .build();
 
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+            log.info("Register successfully for user with email: {}", registerRequest.getEmail());
+            return modelMapper.map(user, UserDto.class);
+        } catch (Exception e) {
+            log.error("Error registering user {}", registerRequest.getEmail(), e);
+            throw new RuntimeException("Error registering user");
+        }
 
-        log.info("Register successfully for user with email: {}", registerRequest.getEmail());
-        return modelMapper.map(user, UserDto.class);
     }
 
 }

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: voltrent
+
+  datasource:
+    url: jdbc:postgresql://auth.cpsewaimstc3.ap-southeast-2.rds.amazonaws.com:5432/voltrent
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  jwt:
+    secret: 089669ad208ee725fe7a17cadb825bcd1f924f73c022bbbc
+    access-token-expiration: 6500
+    refresh-token-expiration: 10000
+
+logging:
+  level:
+    web: DEBUG
+
+payment:
+  vnpay:
+    tmn-code: X5AL5D3N
+    secret-key: 50NE93Q8ATV8MPHQG7O4QTDI1EZ803GR
+    init-payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    return-url: https://dev.payment.com/order/%s/status
+    timeout: 15 # in minutes
