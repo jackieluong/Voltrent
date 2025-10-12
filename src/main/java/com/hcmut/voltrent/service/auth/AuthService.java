@@ -78,7 +78,7 @@ public class AuthService {
     }
 
     public UserDto register(RegisterRequest registerRequest){
-        Optional.ofNullable(userRepository.findByEmail(registerRequest.getEmail()))
+        userRepository.findByEmail(registerRequest.getEmail())
                 .ifPresent(user -> {
                     log.error("Email already exists: {}", registerRequest.getEmail());
                     throw new IllegalArgumentException("Email already exists");
