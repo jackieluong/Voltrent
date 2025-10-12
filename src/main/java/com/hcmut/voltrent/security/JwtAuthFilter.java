@@ -21,6 +21,7 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
@@ -53,6 +54,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         .getBody();
 
                 String userId = claims.getSubject();
+                String email = claims.get("email", String.class);
+
+                if (userId == null || email == null) {
+                    log.warn("JWT token is missing subject or email");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Invalid token: missing subject or email");
+                    return;
+                }
+
                 Object rolesObj = claims.get("roles");
                 if (rolesObj == null) {
                     rolesObj = claims.get("role");
@@ -87,7 +97,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         .toList();
 
                 // Set authentication
-                var authentication = new UsernamePasswordAuthenticationToken(userId, token, authorities);
+                Map<String, String> userPrincipal = Map.of("userId", userId, "email", email);
+                var authentication = new UsernamePasswordAuthenticationToken(userPrincipal, token, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {

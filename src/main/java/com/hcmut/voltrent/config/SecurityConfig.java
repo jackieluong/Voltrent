@@ -37,7 +37,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String whiteList[] = { "/api/**",
+        String whiteList[] = { "/api/**", "/vehicles/search"
 
         };
 
