@@ -46,7 +46,7 @@ public class VNPayConfig {
 
     public Map<String, String> getVNPayConfig() {
 
-        var vnCalendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        var vnCalendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         var createdDate = DateUtils.formatVnTime(vnCalendar);
         vnCalendar.add(Calendar.MINUTE, paymentTimeout);
         var expiredDate = DateUtils.formatVnTime(vnCalendar);    // 4. expiredDate for secure

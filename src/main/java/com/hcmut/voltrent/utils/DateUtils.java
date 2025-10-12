@@ -25,6 +25,7 @@ public class DateUtils {
     }
 
     public static String formatVnTime(Calendar calendar) {
+        VNPAY_DATE_FORMAT.setTimeZone(calendar.getTimeZone()); //  use the VN timezone
         return VNPAY_DATE_FORMAT.format(calendar.getTime());
     }
 
