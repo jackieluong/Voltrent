@@ -51,6 +51,7 @@ public class VNPayStrategy implements PaymentStrategy<VNPayResponse, IpnResponse
         savePaymentRequest.setTransactionId(params.get(VNPayParams.TRANSACTION_NO));
         savePaymentRequest.setPartnerPayDate(params.get(VNPayParams.PAY_DATE));
         savePaymentRequest.setPaymentStatus(PaymentUtils.getPaymentStatusFromVnpayCode(responseCode));
+        savePaymentRequest.setPartnerCode(responseCode);
         return savePaymentRequest;
 
     }

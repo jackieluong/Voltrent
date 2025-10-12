@@ -30,6 +30,8 @@ public class Payment extends BaseEntity{
 
     private String partnerPayDate;
 
+    private String partnerCode;
+
     @PrePersist
     public void prePersist() {
         id = System.currentTimeMillis();

@@ -68,6 +68,7 @@ public class PaymentService implements IPaymentService {
                 .transactionRef(paymentRequest.getTransactionId())
                 .status(paymentRequest.getPaymentStatus().getDescription())
                 .partnerPayDate(paymentRequest.getPartnerPayDate())
+                .partnerCode(paymentRequest.getPartnerCode())
                 .build();
         try{
             log.info("Saving payment {}", payment);

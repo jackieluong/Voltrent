@@ -18,5 +18,6 @@ public class SavePaymentRequest extends PaymentRequest{
 
     private String partnerPayDate;
 
+    private String partnerCode;
     private PaymentStatus paymentStatus;
 }
