@@ -10,6 +10,6 @@ public class VoltrentApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VoltrentApplication.class, args);
-	}
+	} 	
 
 }
