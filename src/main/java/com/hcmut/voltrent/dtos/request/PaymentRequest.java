@@ -17,6 +17,7 @@ public class PaymentRequest {
     @JsonProperty("booking_id")
     protected String bookingId;
 
+    @JsonProperty("total_amount")
     protected double totalAmount;
 
     @NotNull(message = "Payment method is required")

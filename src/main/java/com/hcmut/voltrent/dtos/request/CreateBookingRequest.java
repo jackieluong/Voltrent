@@ -22,5 +22,5 @@ public class CreateBookingRequest {
     private String endTime;
 
     @JsonProperty("total_amount")
-    private Long totalAmount;
+    private double totalAmount;
 }

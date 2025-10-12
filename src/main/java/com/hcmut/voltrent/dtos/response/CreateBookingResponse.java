@@ -1,5 +1,6 @@
 package com.hcmut.voltrent.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,8 +9,12 @@ import lombok.Setter;
 @Setter
 @Builder
 public class CreateBookingResponse {
+    @JsonProperty("booking_id")
     private String bookingId;
+    @JsonProperty("vehicle_id")
     private String vehicleId;
     private String status;
-    private Long totalAmount;
+
+    @JsonProperty("total_amount")
+    private double totalAmount;
 }
