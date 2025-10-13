@@ -25,6 +25,11 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    public static String[] whiteList = { "/api/auth/**", "/vehicles/search",
+            "/swagger-ui/**","/v3/api-docs/**",
+            "/api/payments/vnpay_ipn"
+
+    };
     @Autowired
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
@@ -37,11 +42,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String[] whiteList = { "/api/auth/**", "/vehicles/search",
-                "/swagger-ui/**","/v3/api-docs/**",
-                "/api/payments/vnpay_ipn"
-
-        };
 
         http
                 .csrf(csrf -> csrf.disable())
