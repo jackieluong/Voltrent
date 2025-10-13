@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,7 +15,9 @@ import lombok.Setter;
 public class LoginResponse {
 
     private String accessToken;
+    private long accessTokenExpiresIn;
     private String refreshToken;
+    private long refreshTokenExpiresIn;
     private String tokenType;
     private UserDto user;
 

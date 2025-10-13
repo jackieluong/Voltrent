@@ -1,5 +1,6 @@
 package com.hcmut.voltrent.security;
 
+import com.hcmut.voltrent.dtos.JwtTokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -30,28 +31,30 @@ public class JwtUtil {
     // -------------------------------
     // Token Creation (Auth Service)
     // -------------------------------
-    public String generateAccessToken(String subject, Map<String, Object> extraClaims) {
+    public JwtTokenResponse generateAccessToken(String subject, Map<String, Object> extraClaims) {
         return buildToken(subject, extraClaims, accessTokenExpiration);
     }
 
-    public String generateRefreshToken(String subject, Map<String, Object> extraClaims) {
+    public JwtTokenResponse generateRefreshToken(String subject, Map<String, Object> extraClaims) {
         return buildToken(subject, extraClaims, refreshTokenExpiration);
     }
 
-    private String buildToken(String subject, Map<String, Object> claims, long expiration) {
+    private JwtTokenResponse buildToken(String subject, Map<String, Object> claims, long expiration) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration * 1000);
 
         if (claims == null) {
             claims = Collections.emptyMap();
         }
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(getSigningKey(secretKeyString), SignatureAlgorithm.HS256)
                 .compact();
+
+        return new JwtTokenResponse(token, expiration);
     }
 
     // -------------------------------

@@ -2,6 +2,7 @@ package com.hcmut.voltrent.service.auth;
 
 import com.hcmut.voltrent.constant.Role;
 import com.hcmut.voltrent.constant.TokenType;
+import com.hcmut.voltrent.dtos.JwtTokenResponse;
 import com.hcmut.voltrent.dtos.request.LoginRequest;
 import com.hcmut.voltrent.dtos.response.LoginResponse;
 import com.hcmut.voltrent.dtos.request.RegisterRequest;
@@ -63,16 +64,20 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getId()),
+        JwtTokenResponse accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getId()),
                 Map.of("role", user.getRole(), "email", user.getEmail())
         );
-        String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getId()),
+
+
+        JwtTokenResponse refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getId()),
                 Map.of("role", user.getRole()));
 
         log.info("Login successfully for user with email: {}", loginRequest.getEmail());
         return LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(accessToken.getToken())
+                .accessTokenExpiresIn(accessToken.getExpiresAt())
+                .refreshToken(refreshToken.getToken())
+                .refreshTokenExpiresIn(refreshToken.getExpiresAt())
                 .tokenType(TokenType.BEARER.getValue())
                 .user(new LoginResponse.UserDto(user.getEmail(), user.getFullname(), user.getPhone(), user.getRole()))
                 .build();

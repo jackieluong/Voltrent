@@ -23,7 +23,7 @@ public class Payment extends BaseEntity{
 
     private String status;
 
-    private Long totalAmount;
+    private double totalAmount;
 
     @Column(name = "transaction_ref")
     private String transactionRef;
