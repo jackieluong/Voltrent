@@ -38,8 +38,8 @@ public class VehicleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('MANAGER')")
-    @Operation(summary = "Thêm phương tiện mới", description = "Chỉ MANAGER mới có quyền thêm phương tiện.")
+    @PreAuthorize("hasRole('COMPANY')")
+    @Operation(summary = "Thêm phương tiện mới", description = "Chỉ COMPANY mới có quyền thêm phương tiện.")
     @ApiResponse(responseCode = "201", description = "Phương tiện được tạo thành công", content = @Content(schema = @Schema(implementation = Vehicle.class)))
     @ApiResponse(responseCode = "400", description = "Yêu cầu không hợp lệ", content = @Content)
     @ApiResponse(responseCode = "401", description = "Không được phép", content = @Content)
@@ -67,7 +67,7 @@ public class VehicleController {
     }
 
     @GetMapping("/my")
-    @PreAuthorize("hasAnyRole('MANAGER','USER')")
+    @PreAuthorize("hasAnyRole('COMPANY')")
     @Operation(summary = "Lấy danh sách phương tiện của người dùng", description = "Yêu cầu phải đăng nhập.")
     public ResponseEntity<?> getMyVehicles(Authentication auth) {
         UUID userId = extractUserId(auth);
@@ -77,8 +77,8 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
-    @Operation(summary = "Cập nhật thông tin phương tiện", description = "Chỉ MANAGER và chủ sở hữu phương tiện có quyền cập nhật.")
+    @PreAuthorize("hasRole('COMPANY')")
+    @Operation(summary = "Cập nhật thông tin phương tiện", description = "Chỉ COMPANY và chủ sở hữu phương tiện có quyền cập nhật.")
     public ResponseEntity<?> updateVehicle(@PathVariable Long id, @Valid @RequestBody UpdateVehicleDTO request,
             Authentication auth) {
         UUID userId = extractUserId(auth);
@@ -87,8 +87,8 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
-    @Operation(summary = "Xóa phương tiện", description = "Chỉ MANAGER và chủ sở hữu phương tiện có quyền xóa.")
+    @PreAuthorize("hasRole('COMPANY')")
+    @Operation(summary = "Xóa phương tiện", description = "Chỉ COMPANY và chủ sở hữu phương tiện có quyền xóa.")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long id, Authentication auth) {
         UUID userId = extractUserId(auth);
         vehicleService.deleteVehicle(id, userId.toString());
@@ -106,7 +106,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}/pause")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Tạm dừng xe", description = "Chỉ chủ sở hữu xe có thể tạm dừng.")
     public ResponseEntity<?> pauseVehicle(@PathVariable Long id, Authentication auth) {
         UUID userId = extractUserId(auth);
@@ -115,7 +115,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}/resume")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Tiếp tục xe", description = "Chỉ chủ sở hữu xe có thể tiếp tục.")
     public ResponseEntity<?> resumeVehicle(@PathVariable Long id, Authentication auth) {
         UUID userId = extractUserId(auth);
