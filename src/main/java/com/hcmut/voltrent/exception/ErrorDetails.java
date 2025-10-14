@@ -2,6 +2,7 @@ package com.hcmut.voltrent.exception;
 
 import java.util.Date;
 
+
 public class ErrorDetails {
     private Date timestamp;
     private String message;

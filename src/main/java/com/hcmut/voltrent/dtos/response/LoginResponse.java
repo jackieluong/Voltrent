@@ -28,6 +28,6 @@ public class LoginResponse {
         private String email;
         private String fullname;
         private String phone;
-        private Role role;
+        private String role;
     }
 }

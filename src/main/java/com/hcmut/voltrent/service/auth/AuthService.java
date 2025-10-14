@@ -95,7 +95,7 @@ public class AuthService {
                 .phone(registerRequest.getPhone())
                 .fullname(registerRequest.getFullname())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.fromValue(registerRequest.getRole()))
+                .role(Role.fromValue(registerRequest.getRole()).getValue())
                 .build();
 
         try {
