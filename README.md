@@ -21,3 +21,8 @@ In the project root (where `docker-compose.yml` is located):
 
 ```bash
 docker-compose up -d
+```
+### 2. Check the logs of the app
+```bash
+docker logs -f voltrent-main-svc
+```
