@@ -71,6 +71,7 @@ public class BookingService implements IBookingService{
 
         try {
             bookingRepository.save(booking);
+            log.info("Saved booking {}", booking);
         } catch (Exception e) {
             log.error("Error updating booking {}", booking, e);
             throw new RuntimeException(e);

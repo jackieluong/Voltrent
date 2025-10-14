@@ -90,13 +90,12 @@ public class AuthService {
                     throw new IllegalArgumentException("Email already exists");
                 });
 
-
         User user = User.builder()
                 .email(registerRequest.getEmail())
                 .phone(registerRequest.getPhone())
                 .fullname(registerRequest.getFullname())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.USER)
+                .role(Role.fromValue(registerRequest.getRole()))
                 .build();
 
         try {

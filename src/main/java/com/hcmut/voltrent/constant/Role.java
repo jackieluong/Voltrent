@@ -6,8 +6,8 @@ public enum Role {
     ADMIN("ADMIN"),
     USER("USER"),
     MANAGER("MANAGER"),
-    GUEST("GUEST");
-
+    GUEST("GUEST"),
+    COMPANY("COMPANY");
     @Getter
     private final String value;
 
@@ -21,6 +21,6 @@ public enum Role {
                 return role;
             }
         }
-        throw new IllegalArgumentException("Invalid Role value: " + value);
+        return Role.GUEST;
     }
 }

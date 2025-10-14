@@ -15,8 +15,7 @@ Make sure you have the following installed:
 
 ---
 
-##🐳 Quick Run: Running with Docker Compose
-
+## 🐳 Quick Run: Running with Docker Compose
 ### 1️⃣ Build and start the containers
 In the project root (where `docker-compose.yml` is located):
 
