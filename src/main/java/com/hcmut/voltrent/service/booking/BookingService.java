@@ -5,6 +5,7 @@ import com.hcmut.voltrent.constant.PaymentGateway;
 import com.hcmut.voltrent.constant.VehicleStatus;
 import com.hcmut.voltrent.dtos.request.CreateBookingRequest;
 import com.hcmut.voltrent.dtos.response.CreateBookingResponse;
+import com.hcmut.voltrent.dtos.response.RentedVehicleDto;
 import com.hcmut.voltrent.entity.Booking;
 import com.hcmut.voltrent.entity.Vehicle;
 import com.hcmut.voltrent.exception.ConflictException;
@@ -22,11 +23,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class BookingService implements IBookingService{
+public class BookingService implements IBookingService {
 
     private final BookingRepository bookingRepository;
     private final VehicleRepository vehicleRepository;
-
 
     public BookingService(BookingRepository bookingRepository, VehicleRepository vehicleRepository) {
         this.bookingRepository = bookingRepository;
@@ -36,9 +36,11 @@ public class BookingService implements IBookingService{
     @Override
     public CreateBookingResponse createBooking(CreateBookingRequest request) {
 
-        if(!isVehicleAvailable(request.getVehicleId(), request.getStartTime(), request.getEndTime())){
-            log.warn("Vehicle with id {} is not available from {} to {}", request.getVehicleId(), request.getStartTime(), request.getEndTime());
-            throw new ConflictException("Vehicle with id " + request.getVehicleId() + " is not available at the given time");
+        if (!isVehicleAvailable(request.getVehicleId(), request.getStartTime(), request.getEndTime())) {
+            log.warn("Vehicle with id {} is not available from {} to {}", request.getVehicleId(),
+                    request.getStartTime(), request.getEndTime());
+            throw new ConflictException(
+                    "Vehicle with id " + request.getVehicleId() + " is not available at the given time");
         }
 
         String userId = SecurityUtil.getCurrentUserLogin()
@@ -53,7 +55,7 @@ public class BookingService implements IBookingService{
                 .totalAmount(request.getTotalAmount())
                 .build();
 
-        try{
+        try {
             Booking saved = bookingRepository.save(newBooking);
             return CreateBookingResponse.builder()
                     .bookingId(String.valueOf(saved.getId()))
@@ -92,14 +94,23 @@ public class BookingService implements IBookingService{
     }
 
     @Override
-    public List<Vehicle> getRentedVehicles(String userId) {
+    public List<RentedVehicleDto> getRentedVehicles(String userId) {
         List<Booking> bookings = bookingRepository.findAllByUserId(userId);
-        List<Long> vehicleIds = bookings.stream()
-                .map(Booking::getVehicleId)
-                .map(Long::valueOf)
-                .distinct()
+        // Lấy thông tin xe và trạng thái booking cho từng booking
+        return bookings.stream()
+                .map(b -> {
+                    Vehicle v = vehicleRepository.findById(Long.valueOf(b.getVehicleId()))
+                            .orElse(null);
+                    return RentedVehicleDto.builder()
+                            .vehicle(v)
+                            .bookingStatus(b.getStatus())
+                            .bookingId(b.getId())
+                            .startTime(b.getStartTime())
+                            .endTime(b.getEndTime())
+                            .build();
+                })
+                .filter(dto -> dto.getVehicle() != null)
                 .collect(Collectors.toList());
-        return vehicleRepository.findAllById(vehicleIds);
     }
 
     private boolean isVehicleAvailable(String vehicleId, String startTime, String endTime) {

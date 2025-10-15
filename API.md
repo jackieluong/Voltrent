@@ -1,14 +1,14 @@
 # Voltrent API Documentation
 
-This document provides the documentation for the Voltrent API.
+Tài liệu này mô tả các API của hệ thống Voltrent.
 
 ## Base URL
 
-`http://localhost:8080`
+`http://localhost:8080/api`
 
 ## Authentication
 
-Most endpoints require a JWT token to be included in the `Authorization` header as a Bearer token.
+Hầu hết các endpoint yêu cầu JWT token trong header `Authorization` dạng Bearer.
 
 `Authorization: Bearer <token>`
 
@@ -16,12 +16,12 @@ Most endpoints require a JWT token to be included in the `Authorization` header 
 
 ## Auth API
 
-Base path: `/api/auth`
+Base path: `/auth`
 
-### Register
+### Đăng ký (Register)
 
-- **Endpoint:** `POST /register`
-- **Description:** Register a new user.
+- **Endpoint:** `POST /auth/register`
+- **Description:** Đăng ký tài khoản mới.
 - **Request Body:**
 
 ```json
@@ -47,10 +47,10 @@ Base path: `/api/auth`
 }
 ```
 
-### Login
+### Đăng nhập (Login)
 
-- **Endpoint:** `POST /login`
-- **Description:** Login a user and get a JWT token.
+- **Endpoint:** `POST /auth/login`
+- **Description:** Đăng nhập và nhận JWT token.
 - **Request Body:**
 
 ```json
@@ -71,6 +71,7 @@ Base path: `/api/auth`
     "refreshToken": "string",
     "tokenType": "Bearer",
     "user": {
+      "id": "string",
       "email": "string",
       "fullname": "string",
       "phone": "string",
@@ -80,24 +81,64 @@ Base path: `/api/auth`
 }
 ```
 
+### Làm mới token (Refresh Token)
+
+- **Endpoint:** `POST /auth/refresh`
+- **Description:** Làm mới access token bằng refresh token.
+- **Request Body:**
+
+```json
+{
+  "refreshToken": "string"
+}
+```
+
+- **Response:**
+
+```json
+{
+  "code": 200,
+  "message": "Token refreshed successfully",
+  "data": {
+    "accessToken": "string",
+    "refreshToken": "string",
+    "tokenType": "Bearer"
+  }
+}
+```
+
+### Đăng xuất (Logout)
+
+- **Endpoint:** `POST /auth/logout`
+- **Description:** Đăng xuất, thu hồi refresh token.
+- **Authentication:** Required.
+- **Response:**
+
+```json
+{
+  "code": 200,
+  "message": "Logout successfully"
+}
+```
+
 ---
 
 ## Booking API
 
-Base path: `/api/bookings`
+Base path: `/bookings`
 
-### Create Booking
+### Tạo booking (Create Booking)
 
-- **Endpoint:** `POST /`
-- **Description:** Create a new booking.
+- **Endpoint:** `POST /bookings`
+- **Description:** Tạo booking mới.
 - **Authentication:** Required.
 - **Request Body:**
 
 ```json
 {
-  "vehicle_id": "string",
-  "start_time": "string (yyyy-MM-dd HH:mm:ss)",
-  "end_time": "string (yyyy-MM-dd HH:mm:ss)"
+  "vehicleId": "string",
+  "startTime": "string (yyyy-MM-dd HH:mm:ss)",
+  "endTime": "string (yyyy-MM-dd HH:mm:ss)"
 }
 ```
 
@@ -110,9 +151,34 @@ Base path: `/api/bookings`
   "data": {
     "bookingId": "string",
     "vehicleId": "string",
-    "status": "string",
+    "status": "PENDING",
     "totalAmount": 0
   }
+}
+```
+
+### Lịch sử booking (Get My Bookings)
+
+- **Endpoint:** `GET /bookings/my`
+- **Description:** Lấy danh sách booking của người dùng hiện tại.
+- **Authentication:** Required.
+- **Response:**
+
+```json
+{
+  "code": 200,
+  "message": "Danh sách booking của bạn",
+  "data": [
+    {
+      "bookingId": "string",
+      "vehicleId": "string",
+      "vehicleName": "string",
+      "startTime": "string",
+      "endTime": "string",
+      "status": "PENDING",
+      "totalAmount": 0
+    }
+  ]
 }
 ```
 
@@ -122,11 +188,11 @@ Base path: `/api/bookings`
 
 Base path: `/vehicles`
 
-### Add Vehicle
+### Thêm xe (Add Vehicle)
 
-- **Endpoint:** `POST /`
-- **Description:** Add a new vehicle.
-- **Authentication:** Required (MANAGER role).
+- **Endpoint:** `POST /vehicles`
+- **Description:** Thêm xe mới (MANAGER).
+- **Authentication:** Required (MANAGER).
 - **Request Body:**
 
 ```json
@@ -145,7 +211,7 @@ Base path: `/vehicles`
   "status": "success",
   "message": "Xe đã được tạo thành công",
   "data": {
-    "id": 0,
+    "id": "string",
     "ownerId": "string",
     "ownerEmail": "string",
     "name": "string",
@@ -157,10 +223,10 @@ Base path: `/vehicles`
 }
 ```
 
-### Get My Vehicles
+### Danh sách xe của tôi (Get My Vehicles)
 
-- **Endpoint:** `GET /my`
-- **Description:** Get the vehicles of the current user.
+- **Endpoint:** `GET /vehicles/my`
+- **Description:** Lấy danh sách xe của người dùng hiện tại.
 - **Authentication:** Required.
 - **Response:**
 
@@ -170,7 +236,7 @@ Base path: `/vehicles`
   "message": "Danh sách phương tiện của bạn",
   "data": [
     {
-      "id": 0,
+      "id": "string",
       "ownerId": "string",
       "ownerEmail": "string",
       "name": "string",
@@ -183,11 +249,34 @@ Base path: `/vehicles`
 }
 ```
 
-### Update Vehicle
+### Chi tiết xe (Get Vehicle Detail)
 
-- **Endpoint:** `PUT /{id}`
-- **Description:** Update a vehicle.
-- **Authentication:** Required (MANAGER role).
+- **Endpoint:** `GET /vehicles/{id}`
+- **Description:** Lấy thông tin chi tiết xe.
+- **Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Thông tin chi tiết xe",
+  "data": {
+    "id": "string",
+    "ownerId": "string",
+    "ownerEmail": "string",
+    "name": "string",
+    "type": "string",
+    "pricePerHour": 0,
+    "imageUrl": "string",
+    "status": "AVAILABLE"
+  }
+}
+```
+
+### Cập nhật xe (Update Vehicle)
+
+- **Endpoint:** `PUT /vehicles/{id}`
+- **Description:** Cập nhật thông tin xe (MANAGER).
+- **Authentication:** Required (MANAGER).
 - **Request Body:**
 
 ```json
@@ -206,7 +295,7 @@ Base path: `/vehicles`
   "status": "success",
   "message": "Cập nhật phương tiện thành công",
   "data": {
-    "id": 0,
+    "id": "string",
     "ownerId": "string",
     "ownerEmail": "string",
     "name": "string",
@@ -218,11 +307,11 @@ Base path: `/vehicles`
 }
 ```
 
-### Delete Vehicle
+### Xóa xe (Delete Vehicle)
 
-- **Endpoint:** `DELETE /{id}`
-- **Description:** Delete a vehicle.
-- **Authentication:** Required (MANAGER role).
+- **Endpoint:** `DELETE /vehicles/{id}`
+- **Description:** Xóa xe (MANAGER).
+- **Authentication:** Required (MANAGER).
 - **Response:**
 
 ```json
@@ -233,10 +322,10 @@ Base path: `/vehicles`
 }
 ```
 
-### Search Vehicles
+### Tìm kiếm xe (Search Vehicles)
 
-- **Endpoint:** `GET /search`
-- **Description:** Search for available vehicles.
+- **Endpoint:** `GET /vehicles/search`
+- **Description:** Tìm kiếm xe khả dụng.
 - **Query Parameters:**
   - `type` (string, optional)
   - `priceMin` (number, optional)
@@ -249,7 +338,7 @@ Base path: `/vehicles`
   "message": "Danh sách xe tìm thấy",
   "data": [
     {
-      "id": 0,
+      "id": "string",
       "ownerId": "string",
       "ownerEmail": "string",
       "name": "string",
@@ -262,11 +351,11 @@ Base path: `/vehicles`
 }
 ```
 
-### Pause Vehicle
+### Tạm dừng xe (Pause Vehicle)
 
-- **Endpoint:** `PUT /{id}/pause`
-- **Description:** Pause a vehicle.
-- **Authentication:** Required (MANAGER role).
+- **Endpoint:** `PUT /vehicles/{id}/pause`
+- **Description:** Tạm dừng xe (MANAGER).
+- **Authentication:** Required (MANAGER).
 - **Response:**
 
 ```json
@@ -274,7 +363,7 @@ Base path: `/vehicles`
   "status": "success",
   "message": "Tạm dừng xe thành công",
   "data": {
-    "id": 0,
+    "id": "string",
     "ownerId": "string",
     "ownerEmail": "string",
     "name": "string",
@@ -286,19 +375,19 @@ Base path: `/vehicles`
 }
 ```
 
-### Resume Vehicle
+### Tiếp tục xe (Resume Vehicle)
 
-- **Endpoint:** `PUT /{id}/resume`
-- **Description:** Resume a vehicle.
-- **Authentication:** Required (MANAGER role).
--- **Response:**
+- **Endpoint:** `PUT /vehicles/{id}/resume`
+- **Description:** Tiếp tục xe (MANAGER).
+- **Authentication:** Required (MANAGER).
+- **Response:**
 
 ```json
 {
   "status": "success",
   "message": "Tiếp tục xe thành công",
   "data": {
-    "id": 0,
+    "id": "string",
     "ownerId": "string",
     "ownerEmail": "string",
     "name": "string",
