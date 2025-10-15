@@ -3,6 +3,7 @@ package com.hcmut.voltrent.controller;
 import com.hcmut.voltrent.dtos.request.AddVehicleDTO;
 import com.hcmut.voltrent.dtos.request.UpdateVehicleDTO;
 import com.hcmut.voltrent.entity.Vehicle;
+import com.hcmut.voltrent.service.booking.IBookingService;
 import com.hcmut.voltrent.service.vehicle.IVehicleService;
 import com.hcmut.voltrent.security.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,10 +31,12 @@ import java.util.*;
 public class VehicleController {
 
     private final IVehicleService vehicleService;
+    private final IBookingService bookingService;
     private final ModelMapper modelMapper;
 
-    public VehicleController(IVehicleService vehicleService, ModelMapper modelMapper) {
+    public VehicleController(IVehicleService vehicleService, IBookingService bookingService, ModelMapper modelMapper) {
         this.vehicleService = vehicleService;
+        this.bookingService = bookingService;
         this.modelMapper = modelMapper;
     }
 
@@ -66,6 +69,16 @@ public class VehicleController {
         }
     }
 
+    @GetMapping("/rented")
+    @PreAuthorize("hasAnyRole('COMPANY', 'USER')")
+    @Operation(summary = "Lấy danh sách các xe đã thuê bởi người dùng hiện tại", description = "Người dùng có thể xem các xe mình đã thuê.")
+    public ResponseEntity<?> getRentedVehicles(Authentication auth) {
+        String userId = extractUserId(auth).toString();
+        List<Vehicle> rentedVehicles = bookingService.getRentedVehicles(userId);
+        String message = rentedVehicles.isEmpty() ? "Bạn chưa thuê xe nào." : "Danh sách xe bạn đã thuê";
+        return buildSuccessResponse(HttpStatus.OK, message, rentedVehicles);
+    }
+
     @GetMapping("/my")
     @PreAuthorize("hasAnyRole('COMPANY')")
     @Operation(summary = "Lấy danh sách phương tiện của người dùng", description = "Yêu cầu phải đăng nhập.")
@@ -96,11 +109,17 @@ public class VehicleController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Tìm kiếm phương tiện khả dụng", description = "Tìm xe theo loại, giá tối thiểu và tối đa.")
-    public ResponseEntity<?> searchVehicles(@RequestParam(required = false) String type,
+    @Operation(summary = "Tìm kiếm phương tiện khả dụng", description = "Tìm xe theo loại, giá tối thiểu và tối đa, vị trí, bán kính, thời gian.")
+    public ResponseEntity<?> searchVehicles(
+            @RequestParam(required = false) String type,
             @RequestParam(required = false) Double priceMin,
-            @RequestParam(required = false) Double priceMax) {
-        List<Vehicle> vehicles = vehicleService.searchVehicles(type, priceMin, priceMax);
+            @RequestParam(required = false) Double priceMax,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false) Double radius,
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end) {
+        List<Vehicle> vehicles = vehicleService.searchVehicles(type, priceMin, priceMax, lat, lng, radius, start, end);
         String message = vehicles.isEmpty() ? "Không tìm thấy xe phù hợp" : "Danh sách xe tìm thấy";
         return buildSuccessResponse(HttpStatus.OK, message, vehicles);
     }
@@ -179,6 +198,6 @@ public class VehicleController {
         return ResponseEntity.status(status).body(Map.of(
                 "status", "error",
                 "message", message,
-                "data", data));
+                "data", data == null ? Collections.emptyMap() : data));
     }
 }

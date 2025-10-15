@@ -2,11 +2,14 @@ package com.hcmut.voltrent.service.booking;
 
 import com.hcmut.voltrent.constant.BookingStatus;
 import com.hcmut.voltrent.constant.PaymentGateway;
+import com.hcmut.voltrent.constant.VehicleStatus;
 import com.hcmut.voltrent.dtos.request.CreateBookingRequest;
 import com.hcmut.voltrent.dtos.response.CreateBookingResponse;
 import com.hcmut.voltrent.entity.Booking;
+import com.hcmut.voltrent.entity.Vehicle;
 import com.hcmut.voltrent.exception.ConflictException;
 import com.hcmut.voltrent.repository.BookingRepository;
+import com.hcmut.voltrent.repository.VehicleRepository;
 import com.hcmut.voltrent.security.JwtUtil;
 import com.hcmut.voltrent.security.SecurityUtil;
 import com.hcmut.voltrent.utils.DateUtils;
@@ -14,16 +17,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class BookingService implements IBookingService{
 
     private final BookingRepository bookingRepository;
+    private final VehicleRepository vehicleRepository;
 
 
-    public BookingService(BookingRepository bookingRepository) {
+    public BookingService(BookingRepository bookingRepository, VehicleRepository vehicleRepository) {
         this.bookingRepository = bookingRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     @Override
@@ -69,14 +76,30 @@ public class BookingService implements IBookingService{
         booking.setStatus(BookingStatus.CONFIRMED.getValue());
         booking.setPaymentCompletedTime(LocalDateTime.now());
 
+        Vehicle vehicle = vehicleRepository.findById(Long.valueOf(booking.getVehicleId()))
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        vehicle.setStatus(VehicleStatus.RENTED);
+
         try {
             bookingRepository.save(booking);
+            vehicleRepository.save(vehicle);
             log.info("Saved booking {}", booking);
         } catch (Exception e) {
             log.error("Error updating booking {}", booking, e);
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public List<Vehicle> getRentedVehicles(String userId) {
+        List<Booking> bookings = bookingRepository.findAllByUserId(userId);
+        List<Long> vehicleIds = bookings.stream()
+                .map(Booking::getVehicleId)
+                .map(Long::valueOf)
+                .distinct()
+                .collect(Collectors.toList());
+        return vehicleRepository.findAllById(vehicleIds);
     }
 
     private boolean isVehicleAvailable(String vehicleId, String startTime, String endTime) {
