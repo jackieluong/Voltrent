@@ -41,4 +41,10 @@ public class Vehicle extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private VehicleStatus status = VehicleStatus.AVAILABLE;
+
+    private boolean isPaused = false;
+
+    private Double latitude;
+
+    private Double longitude;
 }

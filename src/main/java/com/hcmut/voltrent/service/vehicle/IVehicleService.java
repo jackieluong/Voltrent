@@ -17,5 +17,6 @@ public interface IVehicleService {
 
     Vehicle resumeVehicle(Long id, String email);
 
-    List<Vehicle> searchVehicles(String type, Double priceMin, Double priceMax);
+    List<Vehicle> searchVehicles(String type, Double priceMin, Double priceMax, Double lat, Double lng, Double radius,
+            String start, String end);
 }
