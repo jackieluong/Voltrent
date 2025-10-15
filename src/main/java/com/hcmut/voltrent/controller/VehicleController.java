@@ -74,7 +74,7 @@ public class VehicleController {
     @Operation(summary = "Lấy danh sách các xe đã thuê bởi người dùng hiện tại", description = "Người dùng có thể xem các xe mình đã thuê.")
     public ResponseEntity<?> getRentedVehicles(Authentication auth) {
         String userId = extractUserId(auth).toString();
-        List<Vehicle> rentedVehicles = bookingService.getRentedVehicles(userId);
+        var rentedVehicles = bookingService.getRentedVehicles(userId);
         String message = rentedVehicles.isEmpty() ? "Bạn chưa thuê xe nào." : "Danh sách xe bạn đã thuê";
         return buildSuccessResponse(HttpStatus.OK, message, rentedVehicles);
     }
