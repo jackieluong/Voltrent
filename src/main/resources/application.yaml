@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: voltrent
@@ -34,6 +35,8 @@ server:
 logging:
   level:
     web: DEBUG
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss
 
 payment:
   vnpay:

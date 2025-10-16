@@ -21,6 +21,6 @@ public enum Role {
                 return role;
             }
         }
-        return Role.GUEST;
+        return USER;
     }
 }
