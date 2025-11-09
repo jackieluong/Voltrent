@@ -11,14 +11,13 @@ import com.hcmut.voltrent.entity.Vehicle;
 import com.hcmut.voltrent.exception.ConflictException;
 import com.hcmut.voltrent.repository.BookingRepository;
 import com.hcmut.voltrent.repository.VehicleRepository;
-import com.hcmut.voltrent.security.JwtUtil;
 import com.hcmut.voltrent.security.SecurityUtil;
-import com.hcmut.voltrent.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,7 +42,8 @@ public class BookingService implements IBookingService {
                     "Vehicle with id " + request.getVehicleId() + " is not available at the given time");
         }
 
-        String userId = SecurityUtil.getCurrentUserLogin()
+        UUID userId = SecurityUtil.getCurrentUserLogin()
+                .map(UUID::fromString)
                 .orElseThrow(() -> new IllegalStateException("No logged in user"));
 
         Booking newBooking = Booking.builder()
@@ -55,19 +55,14 @@ public class BookingService implements IBookingService {
                 .totalAmount(request.getTotalAmount())
                 .build();
 
-        try {
-            Booking saved = bookingRepository.save(newBooking);
-            return CreateBookingResponse.builder()
-                    .bookingId(String.valueOf(saved.getId()))
-                    .vehicleId(String.valueOf(saved.getVehicleId()))
-                    .totalAmount(request.getTotalAmount())
-                    .status(BookingStatus.PENDING_PAYMENT.getValue())
-                    .build();
-        } catch (Exception e) {
-            log.error("Error saving booking {}", newBooking, e);
-            throw new RuntimeException("Error creating new booking");
-        }
+        Booking saved = bookingRepository.save(newBooking);
 
+        return CreateBookingResponse.builder()
+                .bookingId(String.valueOf(saved.getId()))
+                .vehicleId(String.valueOf(saved.getVehicleId()))
+                .totalAmount(saved.getTotalAmount())
+                .status(saved.getStatus())
+                .build();
     }
 
     @Override
@@ -78,29 +73,24 @@ public class BookingService implements IBookingService {
         booking.setStatus(BookingStatus.CONFIRMED.getValue());
         booking.setPaymentCompletedTime(LocalDateTime.now());
 
-        Vehicle vehicle = vehicleRepository.findById(Long.valueOf(booking.getVehicleId()))
+        Vehicle vehicle = vehicleRepository.findById(booking.getVehicleId())
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
         vehicle.setStatus(VehicleStatus.RENTED);
 
-        try {
-            bookingRepository.save(booking);
-            vehicleRepository.save(vehicle);
-            log.info("Saved booking {}", booking);
-        } catch (Exception e) {
-            log.error("Error updating booking {}", booking, e);
-            throw new RuntimeException(e);
-        }
-
+        bookingRepository.save(booking);
+        vehicleRepository.save(vehicle);
+        log.info("Booking {} marked as paid", bookingId);
     }
 
     @Override
-    public List<RentedVehicleDto> getRentedVehicles(String userId) {
-        List<Booking> bookings = bookingRepository.findAllByUserId(userId);
-        // Lấy thông tin xe và trạng thái booking cho từng booking
-        return bookings.stream()
+    public List<RentedVehicleDto> getRentedVehicles(String userIdStr) {
+        UUID userId = UUID.fromString(userIdStr);
+
+        return bookingRepository.findAllByUserId(userId)
+                .stream()
                 .map(b -> {
-                    Vehicle v = vehicleRepository.findById(Long.valueOf(b.getVehicleId()))
-                            .orElse(null);
+                    Vehicle v = vehicleRepository.findById(b.getVehicleId()).orElse(null);
                     return RentedVehicleDto.builder()
                             .vehicle(v)
                             .bookingStatus(b.getStatus())
@@ -113,7 +103,7 @@ public class BookingService implements IBookingService {
                 .collect(Collectors.toList());
     }
 
-    private boolean isVehicleAvailable(String vehicleId, String startTime, String endTime) {
+    private boolean isVehicleAvailable(Long vehicleId, String startTime, String endTime) {
         return true;
     }
 }

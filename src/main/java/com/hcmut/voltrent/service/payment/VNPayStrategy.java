@@ -45,7 +45,7 @@ public class VNPayStrategy implements PaymentStrategy<VNPayResponse, IpnResponse
         String responseCode = params.get(VNPayParams.RESPONSE_CODE);
 
         SavePaymentRequest savePaymentRequest = new SavePaymentRequest();
-        savePaymentRequest.setBookingId(String.valueOf(bookingId));
+        savePaymentRequest.setBookingId(Long.valueOf(bookingId));
         savePaymentRequest.setGateway(PaymentGateway.VNPAY);
         savePaymentRequest.setTotalAmount(Double.parseDouble(params.get(VNPayParams.AMOUNT)));
         savePaymentRequest.setTransactionId(params.get(VNPayParams.TRANSACTION_NO));

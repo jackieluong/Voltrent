@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "bookings", indexes = {
@@ -15,17 +16,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Booking extends BaseEntity{
+public class Booking extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private String userId;
+    private UUID userId;
 
     @Column(name = "vehicle_id", nullable = false)
-    private String vehicleId;
+    private Long vehicleId;
 
     @Column(name = "start_time")
     private String startTime;
@@ -39,6 +40,5 @@ public class Booking extends BaseEntity{
     private String status;
 
     private LocalDateTime paymentCompletedTime;
-
 
 }

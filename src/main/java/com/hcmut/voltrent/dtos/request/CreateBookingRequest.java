@@ -11,7 +11,7 @@ public class CreateBookingRequest {
 
     @JsonProperty("vehicle_id")
     @NotEmpty(message = "Vehicle id cannot be empty")
-    private String vehicleId;
+    private Long vehicleId;
 
     @NotEmpty(message = "Start time cannot be empty")
     @JsonProperty("start_time")
