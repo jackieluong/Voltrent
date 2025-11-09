@@ -15,7 +15,7 @@ public class PaymentRequest {
 
     @NotEmpty(message = "Booking id is required")
     @JsonProperty("booking_id")
-    protected String bookingId;
+    protected Long bookingId;
 
     @JsonProperty("total_amount")
     protected double totalAmount;
