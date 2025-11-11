@@ -4,9 +4,9 @@ spring:
     name: voltrent
 
   datasource:
-    url: jdbc:postgresql://auth.cpsewaimstc3.ap-southeast-2.rds.amazonaws.com:5432/voltrent
-    username: voltrent_user
-    password: hmtt2509
+    url: jdbc:postgresql://localhost:5432/voltrent
+    username: postgres
+    password:
     driver-class-name: org.postgresql.Driver
 
   jpa:

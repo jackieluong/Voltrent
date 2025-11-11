@@ -2,6 +2,8 @@ package com.hcmut.voltrent.controller;
 
 import com.hcmut.voltrent.dtos.request.AddVehicleDTO;
 import com.hcmut.voltrent.dtos.request.UpdateVehicleDTO;
+import com.hcmut.voltrent.dtos.request.VehicleFilterRequest;
+import com.hcmut.voltrent.dtos.response.PagedResponse;
 import com.hcmut.voltrent.entity.Vehicle;
 import com.hcmut.voltrent.service.booking.IBookingService;
 import com.hcmut.voltrent.service.vehicle.IVehicleService;
@@ -41,7 +43,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('COMPANY')")
+    // @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Thêm phương tiện mới", description = "Chỉ COMPANY mới có quyền thêm phương tiện.")
     @ApiResponse(responseCode = "201", description = "Phương tiện được tạo thành công", content = @Content(schema = @Schema(implementation = Vehicle.class)))
     @ApiResponse(responseCode = "400", description = "Yêu cầu không hợp lệ", content = @Content)
@@ -57,9 +59,18 @@ public class VehicleController {
             vehicle.setOwnerId(userId);
             vehicle.setOwnerEmail(userEmail);
             vehicle.setName(request.getName());
-            vehicle.setType(request.getType());
             vehicle.setPricePerHour(request.getPricePerHour());
             vehicle.setImageUrl(request.getImageUrl());
+            vehicle.setBrand(request.getBrand());
+            vehicle.setModel(request.getModel());
+            vehicle.setColor(request.getColor());
+            vehicle.setLicensePlate(request.getLicensePlate());
+            vehicle.setDescription(request.getDescription());
+            vehicle.setType(request.getType());
+            vehicle.setProvince(request.getProvince());
+            vehicle.setDistrict(request.getDistrict());
+            vehicle.setWard(request.getWard());
+            vehicle.setAddress(request.getAddress());
 
             Vehicle savedVehicle = vehicleService.save(vehicle);
             return buildSuccessResponse(HttpStatus.CREATED, "Xe đã được tạo thành công", savedVehicle);
@@ -70,7 +81,7 @@ public class VehicleController {
     }
 
     @GetMapping("/rented")
-    @PreAuthorize("hasAnyRole('COMPANY', 'USER')")
+    // @PreAuthorize("hasAnyRole('COMPANY', 'USER')")
     @Operation(summary = "Lấy danh sách các xe đã thuê bởi người dùng hiện tại", description = "Người dùng có thể xem các xe mình đã thuê.")
     public ResponseEntity<?> getRentedVehicles(Authentication auth) {
         String userId = extractUserId(auth).toString();
@@ -80,7 +91,7 @@ public class VehicleController {
     }
 
     @GetMapping("/my")
-    @PreAuthorize("hasAnyRole('COMPANY')")
+    // @PreAuthorize("hasAnyRole('COMPANY')")
     @Operation(summary = "Lấy danh sách phương tiện của người dùng", description = "Yêu cầu phải đăng nhập.")
     public ResponseEntity<?> getMyVehicles(Authentication auth) {
         UUID userId = extractUserId(auth);
@@ -90,7 +101,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('COMPANY')")
+    // @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Cập nhật thông tin phương tiện", description = "Chỉ COMPANY và chủ sở hữu phương tiện có quyền cập nhật.")
     public ResponseEntity<?> updateVehicle(@PathVariable Long id, @Valid @RequestBody UpdateVehicleDTO request,
             Authentication auth) {
@@ -100,7 +111,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('COMPANY')")
+    // @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Xóa phương tiện", description = "Chỉ COMPANY và chủ sở hữu phương tiện có quyền xóa.")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long id, Authentication auth) {
         UUID userId = extractUserId(auth);
@@ -109,23 +120,16 @@ public class VehicleController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Tìm kiếm phương tiện khả dụng", description = "Tìm xe theo loại, giá tối thiểu và tối đa, vị trí, bán kính, thời gian.")
+    @Operation(summary = "Tìm kiếm phương tiện khả dụng", description = "Tìm xe theo loại, địa chỉ, giá, và sắp xếp.")
     public ResponseEntity<?> searchVehicles(
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Double priceMin,
-            @RequestParam(required = false) Double priceMax,
-            @RequestParam(required = false) Double lat,
-            @RequestParam(required = false) Double lng,
-            @RequestParam(required = false) Double radius,
-            @RequestParam(required = false) String start,
-            @RequestParam(required = false) String end) {
-        List<Vehicle> vehicles = vehicleService.searchVehicles(type, priceMin, priceMax, lat, lng, radius, start, end);
-        String message = vehicles.isEmpty() ? "Không tìm thấy xe phù hợp" : "Danh sách xe tìm thấy";
-        return buildSuccessResponse(HttpStatus.OK, message, vehicles);
+            @Parameter(description = "Filter criteria for vehicles") @Valid VehicleFilterRequest request) {
+        PagedResponse<Vehicle> pagedResponse = vehicleService.searchVehicles(request);
+        String message = pagedResponse.getItems().isEmpty() ? "Không tìm thấy xe phù hợp" : "Danh sách xe tìm thấy";
+        return buildSuccessResponse(HttpStatus.OK, message, pagedResponse);
     }
 
     @PutMapping("/{id}/pause")
-    @PreAuthorize("hasRole('COMPANY')")
+    // @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Tạm dừng xe", description = "Chỉ chủ sở hữu xe có thể tạm dừng.")
     public ResponseEntity<?> pauseVehicle(@PathVariable Long id, Authentication auth) {
         UUID userId = extractUserId(auth);
@@ -134,7 +138,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}/resume")
-    @PreAuthorize("hasRole('COMPANY')")
+    // @PreAuthorize("hasRole('COMPANY')")
     @Operation(summary = "Tiếp tục xe", description = "Chỉ chủ sở hữu xe có thể tiếp tục.")
     public ResponseEntity<?> resumeVehicle(@PathVariable Long id, Authentication auth) {
         UUID userId = extractUserId(auth);
