@@ -54,7 +54,7 @@ public class VehicleController {
             UUID userId = extractUserId(auth);
             String userEmail = extractUserEmail(auth);
             Vehicle vehicle = new Vehicle();
-            vehicle.setOwnerId(userId);
+            vehicle.setOwnerId(String.valueOf(userId));
             vehicle.setOwnerEmail(userEmail);
             vehicle.setName(request.getName());
             vehicle.setType(request.getType());

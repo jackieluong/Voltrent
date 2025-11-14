@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
-    List<Vehicle> findByOwnerId(UUID ownerId);
+    List<Vehicle> findByOwnerId(String ownerId);
 
     List<Vehicle> findByTypeContainingAndPricePerHourBetween(String type, Double priceMin, Double priceMax);
 

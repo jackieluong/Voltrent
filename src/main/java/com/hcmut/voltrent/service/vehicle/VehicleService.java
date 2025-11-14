@@ -39,8 +39,7 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public List<Vehicle> getMyVehicles(String ownerIdStr) {
-        UUID ownerId = UUID.fromString(ownerIdStr);
-        return vehicleRepository.findByOwnerId(ownerId);
+        return vehicleRepository.findByOwnerId(ownerIdStr);
     }
 
     @Override
@@ -143,13 +142,13 @@ public class VehicleService implements IVehicleService {
     }
 
     private Vehicle findAndVerifyOwnership(Long id, String ownerIdStr) {
-        UUID ownerId = UUID.fromString(ownerIdStr);
+
         // Find the vehicle or throw an exception if it doesn't exist.
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle with ID '" + id + "' not found."));
 
         // Check if the owner's ID of the vehicle matches the provided owner ID.
-        if (!vehicle.getOwnerId().equals(ownerId)) {
+        if (!vehicle.getOwnerId().equals(ownerIdStr)) {
             throw new UnauthorizedVehicleAccessException("You do not have permission to modify this vehicle.");
         }
 

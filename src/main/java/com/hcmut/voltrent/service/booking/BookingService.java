@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,7 +49,7 @@ public class BookingService implements IBookingService {
 
         Booking newBooking = Booking.builder()
                 .userId(userId)
-                .vehicleId(request.getVehicleId())
+                .vehicleId(Long.valueOf(request.getVehicleId()))
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .status(BookingStatus.PENDING_PAYMENT.getValue())
@@ -78,7 +79,7 @@ public class BookingService implements IBookingService {
         booking.setStatus(BookingStatus.CONFIRMED.getValue());
         booking.setPaymentCompletedTime(LocalDateTime.now());
 
-        Vehicle vehicle = vehicleRepository.findById(Long.valueOf(booking.getVehicleId()))
+        Vehicle vehicle = vehicleRepository.findById(booking.getVehicleId())
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
         vehicle.setStatus(VehicleStatus.RENTED);
 
@@ -99,7 +100,7 @@ public class BookingService implements IBookingService {
         // Lấy thông tin xe và trạng thái booking cho từng booking
         return bookings.stream()
                 .map(b -> {
-                    Vehicle v = vehicleRepository.findById(Long.valueOf(b.getVehicleId()))
+                    Vehicle v = vehicleRepository.findById(b.getVehicleId())
                             .orElse(null);
                     return RentedVehicleDto.builder()
                             .vehicle(v)

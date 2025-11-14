@@ -22,7 +22,7 @@ public class Vehicle extends BaseEntity {
     private Long id;
 
     @Column(name = "owner_id", nullable = false)
-    private UUID ownerId;
+    private String ownerId;
 
     @Column(name = "owner_email", nullable = false)
     private String ownerEmail;
