@@ -1,10 +1,14 @@
 package com.hcmut.voltrent.service.vehicle;
 
 import com.hcmut.voltrent.dtos.request.UpdateVehicleDTO;
+import com.hcmut.voltrent.dtos.request.VehicleFilterRequest;
+import com.hcmut.voltrent.dtos.response.PagedResponse;
 import com.hcmut.voltrent.entity.Vehicle;
+
 import java.util.List;
 
 public interface IVehicleService {
+
     Vehicle save(Vehicle vehicle);
 
     List<Vehicle> getMyVehicles(String email);
@@ -17,6 +21,7 @@ public interface IVehicleService {
 
     Vehicle resumeVehicle(Long id, String email);
 
-    List<Vehicle> searchVehicles(String type, Double priceMin, Double priceMax, Double lat, Double lng, Double radius,
-            String start, String end);
+    PagedResponse<Vehicle> searchVehicles(VehicleFilterRequest request);
+
+    List<Vehicle> findAll();
 }

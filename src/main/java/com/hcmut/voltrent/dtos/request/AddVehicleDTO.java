@@ -1,6 +1,6 @@
 package com.hcmut.voltrent.dtos.request;
 
-import jakarta.validation.constraints.NotBlank;
+import com.hcmut.voltrent.constant.VehicleType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -17,15 +17,37 @@ import lombok.ToString;
 @ToString
 public class AddVehicleDTO {
 
-    @NotBlank(message = "Tên không được để trống")
+    @NotNull(message = "Tên không được để trống")
     private String name;
 
-    @NotBlank(message = "Loại xe không được để trống")
-    private String type;
+    private String brand;
+
+    private String model;
+
+    private String color;
+
+    private String licensePlate;
+
+    @NotNull(message = "Loại xe không được để trống")
+    private VehicleType type;
 
     @NotNull(message = "Giá mỗi giờ không được để trống")
     @Positive(message = "Giá mỗi giờ phải là số dương")
     private Double pricePerHour;
 
+    private String description;
+
     private String imageUrl;
+
+    @NotNull(message = "Tỉnh/Thành phố không được để trống")
+    private String province;
+
+    @NotNull(message = "Quận/Huyện không được để trống")
+    private String district;
+
+    @NotNull(message = "Phường/Xã không được để trống")
+    private String ward;
+
+    @NotNull(message = "Địa chỉ không được để trống")
+    private String address;
 }
