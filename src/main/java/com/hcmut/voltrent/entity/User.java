@@ -1,7 +1,6 @@
 package com.hcmut.voltrent.entity;
 
 
-import com.hcmut.voltrent.constant.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,8 +17,8 @@ public class User extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
-    private UUID id;
+    @Column(length = 36, updatable = false, nullable = false)
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -33,5 +32,8 @@ public class User extends BaseEntity {
 
     private String role;
 
-
+    @PrePersist
+    public void prePersist() {
+        id = UUID.randomUUID().toString();
+    }
 }

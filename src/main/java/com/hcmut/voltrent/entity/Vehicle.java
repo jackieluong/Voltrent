@@ -28,8 +28,8 @@ public class Vehicle extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "owner_id", nullable = false)
-  private UUID ownerId;
+    @Column(name = "owner_id", nullable = false)
+    private String ownerId;
 
   @Column(name = "owner_email", nullable = false)
   private String ownerEmail;

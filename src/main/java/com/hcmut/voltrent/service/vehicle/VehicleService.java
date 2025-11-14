@@ -31,7 +31,6 @@ public class VehicleService implements IVehicleService {
     private final VehicleRepository vehicleRepository;
     private final BookingRepository bookingRepository;
 
-    // Using constructor injection is a best practice over field injection
     @Autowired
     public VehicleService(VehicleRepository vehicleRepository, BookingRepository bookingRepository) {
         this.vehicleRepository = vehicleRepository;
@@ -40,28 +39,23 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public Vehicle save(Vehicle vehicle) {
-        // When creating a new vehicle, ensure its status is set to AVAILABLE.
         vehicle.setStatus(VehicleStatus.AVAILABLE);
         return vehicleRepository.save(vehicle);
     }
 
     @Override
     public List<Vehicle> getMyVehicles(String ownerIdStr) {
-        UUID ownerId = UUID.fromString(ownerIdStr);
-        return vehicleRepository.findByOwnerId(ownerId);
+        return vehicleRepository.findByOwnerId(ownerIdStr);
     }
 
     @Override
     public Vehicle updateVehicle(Long id, UpdateVehicleDTO vehicleDTO, String ownerIdStr) {
         Vehicle existingVehicle = findAndVerifyOwnership(id, ownerIdStr);
 
-        // Update fields from the DTO
         existingVehicle.setName(vehicleDTO.getName());
         existingVehicle.setType(vehicleDTO.getType());
         existingVehicle.setPricePerHour(vehicleDTO.getPricePerHour());
         existingVehicle.setImageUrl(vehicleDTO.getImageUrl());
-
-        // NEW: map additional searchable/updatable attributes
         existingVehicle.setBrand(vehicleDTO.getBrand());
         existingVehicle.setModel(vehicleDTO.getModel());
         existingVehicle.setColor(vehicleDTO.getColor());
@@ -84,7 +78,6 @@ public class VehicleService implements IVehicleService {
     @Override
     public Vehicle pauseVehicle(Long id, String ownerIdStr) {
         Vehicle existingVehicle = findAndVerifyOwnership(id, ownerIdStr);
-        // Set the status to PAUSED to make it temporarily unavailable for rent
         existingVehicle.setStatus(VehicleStatus.PAUSED);
         return vehicleRepository.save(existingVehicle);
     }
@@ -92,7 +85,6 @@ public class VehicleService implements IVehicleService {
     @Override
     public Vehicle resumeVehicle(Long id, String ownerIdStr) {
         Vehicle existingVehicle = findAndVerifyOwnership(id, ownerIdStr);
-        // Set the status back to AVAILABLE
         existingVehicle.setStatus(VehicleStatus.AVAILABLE);
         return vehicleRepository.save(existingVehicle);
     }
@@ -106,7 +98,7 @@ public class VehicleService implements IVehicleService {
                 .and(VehicleSpecification.hasAddress(request.getAddress()))
                 .and(VehicleSpecification.hasPriceBetween(request.getPriceMin(), request.getPriceMax()));
 
-        Sort sort; // Default sort
+        Sort sort;
         if (request.getSort() != null && !request.getSort().isEmpty()) {
             switch (request.getSort()) {
                 case "price_asc":
@@ -128,21 +120,22 @@ public class VehicleService implements IVehicleService {
         }
 
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
-
         Page<Vehicle> vehiclePage = vehicleRepository.findAll(spec, pageable);
 
         return new PagedResponse<>(vehiclePage.getContent(), vehiclePage.getNumber(),
                 vehiclePage.getSize(), vehiclePage.getTotalElements(), vehiclePage.getTotalPages());
     }
 
+    @Override
+    public List<Vehicle> findAll() {
+        return vehicleRepository.findAll();
+    }
+
     private Vehicle findAndVerifyOwnership(Long id, String ownerIdStr) {
-        UUID ownerId = UUID.fromString(ownerIdStr);
-        // Find the vehicle or throw an exception if it doesn't exist.
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle with ID '" + id + "' not found."));
 
-        // Check if the owner's ID of the vehicle matches the provided owner ID.
-        if (!vehicle.getOwnerId().equals(ownerId)) {
+        if (!vehicle.getOwnerId().equals(ownerIdStr)) {
             throw new UnauthorizedVehicleAccessException("You do not have permission to modify this vehicle.");
         }
 

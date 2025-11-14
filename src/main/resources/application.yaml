@@ -4,9 +4,9 @@ spring:
     name: voltrent
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/voltrent
-    username: postgres
-    password:
+    url: jdbc:postgresql://ep-still-wind-a1vsdis6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+    username: neondb_owner
+    password: npg_cCtLQIy1bEv3
     driver-class-name: org.postgresql.Driver
 
   jpa:

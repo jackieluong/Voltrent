@@ -63,7 +63,7 @@ public class PaymentService implements IPaymentService {
 
         Payment payment = Payment.builder()
                 .gateway(paymentRequest.getGateway().getValue())
-                .bookingId(paymentRequest.getBookingId())
+                .bookingId(Long.valueOf(paymentRequest.getBookingId()))
                 .totalAmount(paymentRequest.getTotalAmount())
                 .transactionRef(paymentRequest.getTransactionId())
                 .status(paymentRequest.getPaymentStatus().getDescription())

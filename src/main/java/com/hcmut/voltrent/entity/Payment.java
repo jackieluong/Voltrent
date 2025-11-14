@@ -17,7 +17,7 @@ public class Payment extends BaseEntity{
     private Long id;
 
     @Column(name = "booking_id", nullable = false)
-    private String bookingId;
+    private Long bookingId;
 
     private String gateway;
 
