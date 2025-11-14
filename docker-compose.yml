@@ -8,13 +8,3 @@ services:
 
     ports:
       - "8080:8080"
-
-  postgres:
-    image: postgres:latest
-    container_name: voltrent-postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    ports:
-      - "5432:5432"

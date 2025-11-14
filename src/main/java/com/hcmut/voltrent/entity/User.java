@@ -16,7 +16,6 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     @Id
-    @GeneratedValue
     @Column(length = 36, updatable = false, nullable = false)
     private String id;
 
