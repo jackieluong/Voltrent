@@ -2,6 +2,7 @@ package com.hcmut.voltrent.service.booking;
 
 import com.hcmut.voltrent.annotations.Caffeine;
 import com.hcmut.voltrent.constant.BookingStatus;
+import com.hcmut.voltrent.constant.CacheKey;
 import com.hcmut.voltrent.constant.PaymentGateway;
 import com.hcmut.voltrent.constant.VehicleStatus;
 import com.hcmut.voltrent.dtos.model.CacheExpiredEvent;
@@ -28,6 +29,7 @@ import static com.hcmut.voltrent.constant.CacheKey.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,13 +60,36 @@ public class BookingService implements IBookingService, CacheExpirationListener<
     }
 
     @Override
+    public Set<String> patterns() {
+        return Set.of(CacheKey.Booking.CACHE_KEY_REGEX);
+    }
+
+    @Override
+    public void onCacheExpired(CacheExpiredEvent<Booking> event) {
+        Booking booking = event.getValue();
+
+        String originalStatus = booking.getStatus();
+        if (BookingStatus.PENDING_PAYMENT.getValue().equals(originalStatus)) {
+            booking.setStatus(BookingStatus.CANCELLED.getValue());
+        }
+
+        try {
+            bookingRepository.save(booking);
+            log.info("Update booking id {}, status from {} to {}", booking.getId(), originalStatus, booking.getStatus());
+        } catch (Exception e) {
+            log.error("Error saving booking {}", booking, e);
+            throw new RuntimeException("Error updating booking status");
+        }
+    }
+
+    @Override
     public CreateBookingResponse createBooking(CreateBookingRequest request) {
 
         if (!isVehicleAvailableInTimeRange(request.getVehicleId(), request.getStartTime(), request.getEndTime())) {
             log.warn("Vehicle with id {} is not available from {} to {}", request.getVehicleId(),
                     request.getStartTime(), request.getEndTime());
             throw new ConflictException("Vehicle with id " + request.getVehicleId() +
-                            " is not available at the given time from " + request.getStartTime() + " to " + request.getEndTime());
+                    " is not available at the given time from " + request.getStartTime() + " to " + request.getEndTime());
         }
 
         String userId = SecurityUtil.getCurrentUserLogin()
@@ -89,7 +114,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
                     .build();
 
             // Save to cache
-            cacheService.put(String.format(BOOKING, saved.getId()), saved, bookingExpireSeconds);
+            cacheService.put(String.format(CacheKey.Booking.BOOKING_ID, saved.getId()), saved, bookingExpireSeconds);
 
             return response;
         } catch (Exception e) {
@@ -153,22 +178,5 @@ public class BookingService implements IBookingService, CacheExpirationListener<
                         && !BookingStatus.CANCELLED.getValue().equals(booking.getStatus())
         );
         return !existOverlap;
-    }
-
-    @Override
-    public void onCacheExpired(CacheExpiredEvent<Booking> event) {
-        Booking booking = event.getValue();
-
-        String originalStatus = booking.getStatus();
-        if (BookingStatus.PENDING_PAYMENT.getValue().equals(originalStatus)) {
-            booking.setStatus(BookingStatus.CANCELLED.getValue());
-        }
-
-        try {
-            bookingRepository.save(booking);
-            log.info("Update booking id {}, status from {} to {}", booking.getId(), originalStatus, booking.getStatus());
-        } catch (Exception e) {
-            log.error("Error saving booking {}", booking, e);
-        }
     }
 }

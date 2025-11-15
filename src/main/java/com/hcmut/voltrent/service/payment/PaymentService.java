@@ -1,19 +1,23 @@
 package com.hcmut.voltrent.service.payment;
 
 import com.hcmut.voltrent.constant.PaymentGateway;
+import com.hcmut.voltrent.dtos.model.CacheExpiredEvent;
 import com.hcmut.voltrent.dtos.request.PaymentRequest;
 import com.hcmut.voltrent.dtos.request.SavePaymentRequest;
 import com.hcmut.voltrent.dtos.response.BasePaymentResponse;
 import com.hcmut.voltrent.entity.Payment;
 import com.hcmut.voltrent.repository.PaymentRepository;
+import com.hcmut.voltrent.service.cache.CacheExpirationListener;
+import com.hcmut.voltrent.service.payment.vnpay.VNPayStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
-public class PaymentService implements IPaymentService {
+public class PaymentService implements IPaymentService, CacheExpirationListener<Payment> {
 
     private final VNPayStrategy vnPayStrategy;
     private final PaymentRepository paymentRepository;
@@ -79,4 +83,13 @@ public class PaymentService implements IPaymentService {
         }
     }
 
+    @Override
+    public Set<String> patterns() {
+        return Set.of("payment_.*");
+    }
+
+    @Override
+    public void onCacheExpired(CacheExpiredEvent<Payment> event) {
+        log.info("Payment cache expired: {}", event.getValue());
+    }
 }

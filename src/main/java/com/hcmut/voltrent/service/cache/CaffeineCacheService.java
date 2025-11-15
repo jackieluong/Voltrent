@@ -44,7 +44,10 @@ public class CaffeineCacheService implements ICacheService {
                         log.warn("Cache Expired with [key={}] [value={}]", key, cacheEntry.getValue());
                         CacheExpiredEvent cacheExpiredEvent = new CacheExpiredEvent<>(key, cacheEntry.getValue(),
                                 cause.toString(), System.currentTimeMillis());
-                        listeners.forEach(l -> l.onCacheExpired(cacheExpiredEvent));
+                        listeners.stream()
+                                .filter(listener -> listener.patterns().stream()
+                                        .anyMatch(pattern -> key.matches(pattern)))
+                                .forEach(l -> l.onCacheExpired(cacheExpiredEvent));
                     }
                 }))
                 .build();
@@ -66,7 +69,7 @@ public class CaffeineCacheService implements ICacheService {
 
     @Override
     public void put(String key, Object value, TimeUnit timeUnit, long time) {
-        cache.put(key, new CacheEntry(value, timeUnit.toSeconds(time)));
+        cache.put(key, new CacheEntry(value, timeUnit.convert(time, TimeUnit.SECONDS)));
         log.info("Put [key={}] [value={}] [ttl={} {}]", key, value, time, timeUnit.name());
     }
 

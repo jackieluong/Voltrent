@@ -1,4 +1,4 @@
-package com.hcmut.voltrent.service.payment;
+package com.hcmut.voltrent.service.payment.vnpay;
 
 import com.hcmut.voltrent.config.VNPayConfig;
 import com.hcmut.voltrent.constant.PaymentGateway;
@@ -7,10 +7,10 @@ import com.hcmut.voltrent.constant.VNPayParams;
 import com.hcmut.voltrent.constant.VnpIpnResponseConst;
 import com.hcmut.voltrent.dtos.request.PaymentRequest;
 import com.hcmut.voltrent.dtos.request.SavePaymentRequest;
-import com.hcmut.voltrent.dtos.response.BasePaymentResponse;
 import com.hcmut.voltrent.dtos.response.IpnResponse;
 import com.hcmut.voltrent.dtos.response.VNPayResponse;
 import com.hcmut.voltrent.service.booking.IBookingService;
+import com.hcmut.voltrent.service.payment.PaymentStrategy;
 import com.hcmut.voltrent.utils.CryptoUtil;
 import com.hcmut.voltrent.utils.PaymentUtils;
 import jakarta.transaction.Transactional;
