@@ -1,10 +1,8 @@
-package com.hcmut.voltrent.dtos;
+package com.hcmut.voltrent.dtos.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @Data
 @AllArgsConstructor

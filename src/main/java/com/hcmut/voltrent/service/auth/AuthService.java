@@ -2,11 +2,11 @@ package com.hcmut.voltrent.service.auth;
 
 import com.hcmut.voltrent.constant.Role;
 import com.hcmut.voltrent.constant.TokenType;
-import com.hcmut.voltrent.dtos.JwtTokenResponse;
+import com.hcmut.voltrent.dtos.model.JwtTokenResponse;
 import com.hcmut.voltrent.dtos.request.LoginRequest;
 import com.hcmut.voltrent.dtos.response.LoginResponse;
 import com.hcmut.voltrent.dtos.request.RegisterRequest;
-import com.hcmut.voltrent.dtos.UserDto;
+import com.hcmut.voltrent.dtos.model.UserDto;
 import com.hcmut.voltrent.entity.User;
 import com.hcmut.voltrent.repository.UserRepository;
 import com.hcmut.voltrent.security.JwtUtil;
@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j

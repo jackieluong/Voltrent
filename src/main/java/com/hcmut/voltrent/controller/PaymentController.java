@@ -1,10 +1,9 @@
 package com.hcmut.voltrent.controller;
 
 import com.hcmut.voltrent.constant.PaymentGateway;
-import com.hcmut.voltrent.dtos.RestResponse;
+import com.hcmut.voltrent.dtos.model.RestResponse;
 import com.hcmut.voltrent.dtos.request.PaymentRequest;
 import com.hcmut.voltrent.dtos.response.BasePaymentResponse;
-import com.hcmut.voltrent.dtos.response.IpnResponse;
 import com.hcmut.voltrent.service.payment.IPaymentService;
 import com.hcmut.voltrent.utils.RequestUtil;
 import jakarta.servlet.http.HttpServletRequest;

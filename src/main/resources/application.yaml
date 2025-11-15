@@ -2,7 +2,9 @@
 spring:
   application:
     name: voltrent
-
+  output:
+    ansi:
+      enabled: always
   datasource:
     url: jdbc:postgresql://ep-still-wind-a1vsdis6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
     username: neondb_owner
@@ -24,6 +26,10 @@ app:
     secret: 089669ad208ee725fe7a17cadb825bcd1f924f73c022bbbc
     access-token-expiration: 6500
     refresh-token-expiration: 10000
+
+cache:
+  booking:
+    expiration: 600 # in seconds
 
 server:
   servlet:

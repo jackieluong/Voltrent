@@ -1,6 +1,6 @@
 package com.hcmut.voltrent.security;
 
-import com.hcmut.voltrent.dtos.JwtTokenResponse;
+import com.hcmut.voltrent.dtos.model.JwtTokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,10 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;

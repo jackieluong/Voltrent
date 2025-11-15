@@ -3,6 +3,7 @@ package com.hcmut.voltrent.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -29,10 +30,10 @@ public class Booking extends BaseEntity{
     private Long vehicleId;
 
     @Column(name = "start_time")
-    private String startTime;
+    private LocalDate startTime;
 
     @Column(name = "end_time")
-    private String endTime;
+    private LocalDate endTime;
 
     @Column(name = "total_amount")
     private double totalAmount;

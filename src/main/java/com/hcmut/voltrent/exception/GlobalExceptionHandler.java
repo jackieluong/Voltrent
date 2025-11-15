@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorDetails> handleConflictException(ConflictException exception, WebRequest webRequest) {
-        log.error("Conflict exception: {}", exception.getMessage(), exception);
+        log.error("Conflict exception: {}", exception.getMessage(), exception.getCause());
 
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
                 webRequest.getDescription(false));

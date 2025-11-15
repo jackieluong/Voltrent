@@ -1,6 +1,10 @@
 package com.hcmut.voltrent.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -8,13 +12,41 @@ import java.util.Date;
 
 public class DateUtils {
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     public static final SimpleDateFormat VNPAY_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+    public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final Logger log = LoggerFactory.getLogger(DateUtils.class);
 
     public static String convertToLocalDateTimeFormat(String time) throws Exception{
         LocalDateTime localDateTime = LocalDateTime.parse(time, formatter);
         return localDateTime.format(formatter);
+    }
+    // Convert date string to LocalDateTime at start of day
+    public static LocalDate convertToLocalDateFormatWithEx(String time) throws Exception {
+        return LocalDate.parse(time, dateFormatter);
+    }
+
+    public static LocalDate convertToLocalDateFormat(String time) {
+        try {
+            return LocalDate.parse(time, dateFormatter);
+        } catch (Exception e) {
+            log.error("Error convert date str {} to {} format: {}", time, DATE_FORMAT, e.getMessage());
+            return null;
+        }
+
+    }
+
+    public static boolean isDateBeforeNow(String date) throws Exception {
+        LocalDate localDate = convertToLocalDateFormat(date);
+        return localDate.isBefore(LocalDate.now());
+    }
+
+    public static boolean isTimeRangeInvalid(String startTime, String endTime) throws Exception {
+        LocalDate start = convertToLocalDateFormat(startTime);
+        LocalDate end = convertToLocalDateFormat(endTime);
+        return start.isAfter(end);
     }
 
     public static String convertDateFormat(String originalValue, String fromFormat, String toFormat) throws Exception {

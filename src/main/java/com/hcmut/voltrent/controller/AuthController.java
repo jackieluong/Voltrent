@@ -1,7 +1,7 @@
 package com.hcmut.voltrent.controller;
 
-import com.hcmut.voltrent.dtos.RestResponse;
-import com.hcmut.voltrent.dtos.UserDto;
+import com.hcmut.voltrent.dtos.model.RestResponse;
+import com.hcmut.voltrent.dtos.model.UserDto;
 import com.hcmut.voltrent.dtos.request.LoginRequest;
 import com.hcmut.voltrent.dtos.request.RegisterRequest;
 import com.hcmut.voltrent.dtos.response.LoginResponse;
