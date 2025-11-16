@@ -32,7 +32,16 @@ app:
 
 cache:
   booking:
-    expiration: 6 # in seconds
+    expiration: 600 # in seconds
+
+aws:
+  s3:
+    bucket-name: ${BUCKET_NAME}
+    region: ${AWS_REGION}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+
 
 server:
   servlet:

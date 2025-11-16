@@ -12,4 +12,12 @@ public class StringUtils {
             return false;
         }
     }
+
+    public static String nullToDefaultString(String input, String defaultValue) {
+        return isNullOrEmpty(input) ? defaultValue : input;
+    }
+
+    public static String nullToEmptyString(String input) {
+        return nullToDefaultString(input, "");
+    }
 }
