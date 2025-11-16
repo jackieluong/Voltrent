@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 public class HttpLoggingFilter implements Filter {
 
     private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
+    private final int maximumLenght = 400;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -89,10 +90,8 @@ public class HttpLoggingFilter implements Filter {
                         """,
                 res.getStatus(),
                 duration,
-                responseBody.isEmpty() ? "(empty)" : responseBody
+                responseBody.isEmpty() ? "(empty)" : responseBody.length() > maximumLenght ?
+                        responseBody.substring(0, maximumLenght) + "..." : responseBody
         );
-
     }
-
-
 }

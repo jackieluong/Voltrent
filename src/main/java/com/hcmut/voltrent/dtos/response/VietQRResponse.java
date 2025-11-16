@@ -1,12 +1,14 @@
 package com.hcmut.voltrent.dtos.response;
 
+import lombok.ToString;
+
+@ToString
 public class VietQRResponse {
 
     private String code;
     private String desc;
     private Data data;
 
-    // Getters and Setters
     public String getCode() {
         return code;
     }
@@ -30,6 +32,7 @@ public class VietQRResponse {
     public void setData(Data data) {
         this.data = data;
     }
+
 
     public static class Data {
         private long acpId;
@@ -68,6 +71,16 @@ public class VietQRResponse {
 
         public void setQrDataURL(String qrDataURL) {
             this.qrDataURL = qrDataURL;
+        }
+
+        @Override
+        public String toString() {
+            return "Data{" +
+                    "acpId=" + acpId +
+                    ", accountName='" + accountName + '\'' +
+                    ", qrCode='" + qrCode + '\'' +
+                    ", qrDataURL='" + (qrDataURL.length() > 300 ? qrDataURL.substring(0, 300) + "..." : qrDataURL )+ '\'' +
+                    '}';
         }
     }
 }

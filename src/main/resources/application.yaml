@@ -10,6 +10,9 @@ spring:
     password: npg_cCtLQIy1bEv3
     driver-class-name: org.postgresql.Driver
 
+  http:
+    codecs:
+      max-in-memory-size: 10MB
   jpa:
     hibernate:
       ddl-auto: update
