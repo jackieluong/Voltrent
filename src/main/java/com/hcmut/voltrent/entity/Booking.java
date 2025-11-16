@@ -26,8 +26,9 @@ public class Booking extends BaseEntity{
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "vehicle_id", nullable = false)
-    private Long vehicleId;
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
 
     @Column(name = "start_time")
     private LocalDate startTime;

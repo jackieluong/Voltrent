@@ -18,7 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,6 +41,7 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public Vehicle save(Vehicle vehicle) {
+        vehicle.setPaused(false);
         vehicle.setStatus(VehicleStatus.AVAILABLE);
         return vehicleRepository.save(vehicle);
     }
@@ -78,6 +81,7 @@ public class VehicleService implements IVehicleService {
     @Override
     public Vehicle pauseVehicle(Long id, String ownerIdStr) {
         Vehicle existingVehicle = findAndVerifyOwnership(id, ownerIdStr);
+        existingVehicle.setPaused(true);
         existingVehicle.setStatus(VehicleStatus.PAUSED);
         return vehicleRepository.save(existingVehicle);
     }
@@ -85,6 +89,7 @@ public class VehicleService implements IVehicleService {
     @Override
     public Vehicle resumeVehicle(Long id, String ownerIdStr) {
         Vehicle existingVehicle = findAndVerifyOwnership(id, ownerIdStr);
+        existingVehicle.setPaused(false);
         existingVehicle.setStatus(VehicleStatus.AVAILABLE);
         return vehicleRepository.save(existingVehicle);
     }
@@ -97,6 +102,13 @@ public class VehicleService implements IVehicleService {
                 .and(VehicleSpecification.hasWard(request.getWard()))
                 .and(VehicleSpecification.hasAddress(request.getAddress()))
                 .and(VehicleSpecification.hasPriceBetween(request.getPriceMin(), request.getPriceMax()));
+
+        if (request.getStartTime() != null && request.getEndTime() != null) {
+            List<Long> unavailableVehicleIds = bookingRepository.findBookedVehicleIds(request.getStartTime(), request.getEndTime());
+            if (unavailableVehicleIds != null && !unavailableVehicleIds.isEmpty()) {
+                spec = spec.and(VehicleSpecification.notInIds(unavailableVehicleIds));
+            }
+        }
 
         Sort sort;
         if (request.getSort() != null && !request.getSort().isEmpty()) {
