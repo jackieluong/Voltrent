@@ -68,7 +68,6 @@ public class VehicleController {
             vehicle.setDescription(request.getDescription());
             vehicle.setType(request.getType());
             vehicle.setProvince(request.getProvince());
-            vehicle.setDistrict(request.getDistrict());
             vehicle.setWard(request.getWard());
             vehicle.setAddress(request.getAddress());
 

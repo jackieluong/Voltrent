@@ -65,7 +65,6 @@ public class VehicleService implements IVehicleService {
         existingVehicle.setLicensePlate(vehicleDTO.getLicensePlate());
         existingVehicle.setDescription(vehicleDTO.getDescription());
         existingVehicle.setProvince(vehicleDTO.getProvince());
-        existingVehicle.setDistrict(vehicleDTO.getDistrict());
         existingVehicle.setWard(vehicleDTO.getWard());
         existingVehicle.setAddress(vehicleDTO.getAddress());
 
@@ -98,7 +97,6 @@ public class VehicleService implements IVehicleService {
     public PagedResponse<Vehicle> searchVehicles(VehicleFilterRequest request) {
         Specification<Vehicle> spec = Specification.where(VehicleSpecification.hasType(request.getType()))
                 .and(VehicleSpecification.hasProvince(request.getProvince()))
-                .and(VehicleSpecification.hasDistrict(request.getDistrict()))
                 .and(VehicleSpecification.hasWard(request.getWard()))
                 .and(VehicleSpecification.hasAddress(request.getAddress()))
                 .and(VehicleSpecification.hasPriceBetween(request.getPriceMin(), request.getPriceMax()));
