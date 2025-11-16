@@ -95,9 +95,12 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         String userId = SecurityUtil.getCurrentUserLogin()
                 .orElseThrow(() -> new IllegalStateException("No logged in user"));
 
+        Vehicle vehicle = vehicleRepository.findById(Long.valueOf(request.getVehicleId()))
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
         Booking newBooking = Booking.builder()
                 .userId(userId)
-                .vehicleId(Long.valueOf(request.getVehicleId()))
+                .vehicle(vehicle)
                 .startTime(LocalDate.parse(request.getStartTime()))
                 .endTime(LocalDate.parse(request.getEndTime()))
                 .status(BookingStatus.PENDING_PAYMENT.getValue())
@@ -108,7 +111,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
             Booking saved = bookingRepository.save(newBooking);
             CreateBookingResponse response = CreateBookingResponse.builder()
                     .bookingId(String.valueOf(saved.getId()))
-                    .vehicleId(String.valueOf(saved.getVehicleId()))
+                    .vehicleId(String.valueOf(saved.getVehicle().getId()))
                     .totalAmount(request.getTotalAmount())
                     .status(BookingStatus.PENDING_PAYMENT.getValue())
                     .build();
@@ -132,9 +135,9 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         booking.setStatus(BookingStatus.CONFIRMED.getValue());
         booking.setPaymentCompletedTime(LocalDateTime.now());
 
-        Vehicle vehicle = vehicleRepository.findById(booking.getVehicleId())
+        Vehicle vehicle = vehicleRepository.findById(booking.getVehicle().getId())
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
-        vehicle.setStatus(VehicleStatus.RENTED);
+        vehicle.setPaused(false);
 
         try {
             bookingRepository.save(booking);
@@ -153,8 +156,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         // Lấy thông tin xe và trạng thái booking cho từng booking
         return bookings.stream()
                 .map(b -> {
-                    Vehicle v = vehicleRepository.findById(b.getVehicleId())
-                            .orElse(null);
+                    Vehicle v = b.getVehicle();
                     return RentedVehicleDto.builder()
                             .vehicle(v)
                             .bookingStatus(b.getStatus())

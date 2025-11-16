@@ -1,8 +1,11 @@
 package com.hcmut.voltrent.repository;
 
+import com.hcmut.voltrent.constant.VehicleStatus;
 import com.hcmut.voltrent.constant.VehicleType;
 import com.hcmut.voltrent.entity.Vehicle;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
 
 public class VehicleSpecification {
 
@@ -12,6 +15,15 @@ public class VehicleSpecification {
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.equal(root.get("type"), type);
+        };
+    }
+
+    public static Specification<Vehicle> hasStatus(VehicleStatus status) {
+        return (root, query, criteriaBuilder) -> {
+            if (status == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("status"), status);
         };
     }
 
@@ -63,6 +75,15 @@ public class VehicleSpecification {
                 return criteriaBuilder.greaterThanOrEqualTo(root.get("pricePerHour"), (double) priceMin);
             }
             return criteriaBuilder.lessThanOrEqualTo(root.get("pricePerHour"), (double) priceMax);
+        };
+    }
+
+    public static Specification<Vehicle> notInIds(List<Long> ids) {
+        return (root, query, criteriaBuilder) -> {
+            if (ids == null || ids.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.not(root.get("id").in(ids));
         };
     }
 }
