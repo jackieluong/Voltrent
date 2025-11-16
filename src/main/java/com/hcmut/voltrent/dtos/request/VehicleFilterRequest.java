@@ -11,7 +11,6 @@ import java.util.Date;
 public class VehicleFilterRequest {
     private VehicleType type;
     private String province;
-    private String district;
     private String ward;
     private String address;
     private Integer priceMin;

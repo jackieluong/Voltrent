@@ -36,15 +36,6 @@ public class VehicleSpecification {
         };
     }
 
-    public static Specification<Vehicle> hasDistrict(String district) {
-        return (root, query, criteriaBuilder) -> {
-            if (district == null || district.isEmpty()) {
-                return criteriaBuilder.conjunction();
-            }
-            return criteriaBuilder.equal(root.get("district"), district);
-        };
-    }
-
     public static Specification<Vehicle> hasWard(String ward) {
         return (root, query, criteriaBuilder) -> {
             if (ward == null || ward.isEmpty()) {

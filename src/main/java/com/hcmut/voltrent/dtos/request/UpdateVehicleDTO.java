@@ -21,7 +21,6 @@ public class UpdateVehicleDTO {
     private String description;
 
     private String province;
-    private String district;
     private String ward;
     private String address;
 }
