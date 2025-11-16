@@ -5,6 +5,7 @@ services:
     image: manhtiennn/voltrent:latest
     container_name: voltrent-main-svc
     restart: always
-
+    env_file:
+      - .env
     ports:
       - "8080:8080"
