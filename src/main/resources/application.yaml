@@ -5,9 +5,9 @@ spring:
     ansi:
       enabled: always
   datasource:
-    url: jdbc:postgresql://ep-still-wind-a1vsdis6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-    username: neondb_owner
-    password: npg_cCtLQIy1bEv3
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   http:
