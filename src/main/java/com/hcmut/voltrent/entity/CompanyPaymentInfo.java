@@ -17,7 +17,7 @@ public class CompanyPaymentInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, name = "company_id" )
+    @Column(nullable = false, name = "company_id", unique = true)
     @JsonAlias({"user_id"})
     private String companyId;
 

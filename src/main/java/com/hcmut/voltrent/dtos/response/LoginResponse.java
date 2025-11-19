@@ -25,6 +25,7 @@ public class LoginResponse {
     @Getter
     @Setter
     public static class UserDto {
+        private String id;
         private String email;
         private String fullname;
         private String phone;

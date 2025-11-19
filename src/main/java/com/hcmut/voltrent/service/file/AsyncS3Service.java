@@ -8,11 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +40,7 @@ public class AsyncS3Service implements IFileService<Mono<String>> {
 
     @Override
     public Mono<String> upload(byte[] bytes, String fileName) {
-        return upload(bytes, fileName, "" );
+        return upload(bytes, fileName, "");
     }
 
     @Override
@@ -50,7 +54,7 @@ public class AsyncS3Service implements IFileService<Mono<String>> {
 
     @Override
     public Mono<String> upload(String filePath, String fileName) {
-        return Mono.just("" );
+        return Mono.just("");
     }
 
     @Override
@@ -61,8 +65,8 @@ public class AsyncS3Service implements IFileService<Mono<String>> {
     @Override
     public Mono<String> upload(byte[] files, String fileName, String folder, Map<String, String> metadata) {
         if (files == null) {
-            log.error("File to upload is null" );
-            return Mono.error(new RuntimeException("File to upload is null" ));
+            log.error("File to upload is null");
+            return Mono.error(new RuntimeException("File to upload is null"));
         }
 
         String key = generateFileName(folder, fileName);
@@ -76,7 +80,7 @@ public class AsyncS3Service implements IFileService<Mono<String>> {
 
             return Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, AsyncRequestBody.fromBytes(files)))
                     .map(response -> {
-                        String uploadedUrl = getS3Url(key);
+                        String uploadedUrl = getS3Url(key).toString();
                         log.info("File uploaded to S3 bucket successfully: [Key={}], [Url={}]", key, uploadedUrl);
                         return uploadedUrl;
                     })
@@ -108,14 +112,18 @@ public class AsyncS3Service implements IFileService<Mono<String>> {
     private String generateFileName(String folderName, String originalFileName) {
         StringBuilder fileName = new StringBuilder();
         if (!StringUtils.isNullOrEmpty(folderName)) {
-            fileName.append(folderName).append("/" );
+            fileName.append(folderName).append("/");
         }
         fileName.append(StringUtils.nullToDefaultString(originalFileName,
                 UUID.randomUUID().toString()));
         return fileName.toString();
     }
 
-    private String getS3Url(String key) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, awsConfig.getRegion(), key);
+    private URL getS3Url(String key) {
+        return s3AsyncClient.utilities().getUrl(builder ->
+                builder.bucket(bucketName)
+                        .key(key)
+                        .region(Region.of(awsConfig.getRegion()))
+                        .build());
     }
 }

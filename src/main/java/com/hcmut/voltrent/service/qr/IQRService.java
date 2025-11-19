@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 public interface IQRService {
 
     CreateQrResponse generateQr(CreateQrRequest request);
+
 }

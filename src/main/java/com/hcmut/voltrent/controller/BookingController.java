@@ -1,8 +1,12 @@
 package com.hcmut.voltrent.controller;
 
 import com.hcmut.voltrent.dtos.model.RestResponse;
+import com.hcmut.voltrent.dtos.request.ConfirmPaymentRequest;
 import com.hcmut.voltrent.dtos.request.CreateBookingRequest;
+import com.hcmut.voltrent.dtos.response.ConfirmPaymentResponse;
+import com.hcmut.voltrent.dtos.response.ConfirmTransferResponse;
 import com.hcmut.voltrent.dtos.response.CreateBookingResponse;
+import com.hcmut.voltrent.dtos.response.GetBookingQRInfo;
 import com.hcmut.voltrent.exception.ErrorDetails;
 import com.hcmut.voltrent.service.booking.IBookingService;
 import com.hcmut.voltrent.utils.DateUtils;
@@ -10,10 +14,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -53,6 +54,43 @@ public class BookingController {
 
         return ResponseEntity.ok(restResponse);
 
+    }
+
+    @GetMapping("/{id}/qr-info")
+    public ResponseEntity<?> getBookingQRInfo(@PathVariable(name = "id") String bookingId) {
+        GetBookingQRInfo response = bookingService.getQRInfo(bookingId);
+        RestResponse restResponse = RestResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("Get booking qr successfully")
+                .data(response)
+                .build();
+
+        return ResponseEntity.ok(restResponse);
+    }
+
+    @PostMapping("/{id}/confirm-transfer")
+    public ResponseEntity<?> confirmBookingTransfer(@PathVariable(name = "id") String bookingId) {
+        ConfirmTransferResponse response = bookingService.confirmTransfer(bookingId);
+        RestResponse restResponse = RestResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("Confirm transfer successfully")
+                .data(response)
+                .build();
+
+        return ResponseEntity.ok(restResponse);
+    }
+
+    @PostMapping("/{id}/confirm-payment")
+    public ResponseEntity<?> confirmPaymentTransfer(@PathVariable(name = "id") String bookingId,
+                                                    @Valid @RequestBody ConfirmPaymentRequest request) {
+        ConfirmPaymentResponse response = bookingService.confirmPayment(bookingId, request);
+        RestResponse restResponse = RestResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("Confirm payment successfully")
+                .data(response)
+                .build();
+
+        return ResponseEntity.ok(restResponse);
     }
 
 }

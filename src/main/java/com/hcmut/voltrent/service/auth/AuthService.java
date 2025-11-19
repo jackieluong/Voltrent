@@ -29,7 +29,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private JwtUtil jwtUtil;
-    private final AuthenticationManager authenticationManager ;
+    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
@@ -78,11 +78,11 @@ public class AuthService {
                 .refreshToken(refreshToken.getToken())
                 .refreshTokenExpiresIn(refreshToken.getExpiresAt())
                 .tokenType(TokenType.BEARER.getValue())
-                .user(new LoginResponse.UserDto(user.getEmail(), user.getFullname(), user.getPhone(), user.getRole()))
+                .user(new LoginResponse.UserDto(user.getId(), user.getEmail(), user.getFullname(), user.getPhone(), user.getRole()))
                 .build();
     }
 
-    public UserDto register(RegisterRequest registerRequest){
+    public UserDto register(RegisterRequest registerRequest) {
         userRepository.findByEmail(registerRequest.getEmail())
                 .ifPresent(user -> {
                     log.error("Email already exists: {}", registerRequest.getEmail());

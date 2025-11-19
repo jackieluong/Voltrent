@@ -76,3 +76,6 @@ payment:
     base-url: https://api.vietqr.io/v2
     api:
       generate-qr: /generate
+
+booking:
+  commission-percent: 0.1

@@ -14,4 +14,6 @@ public interface CompanyPaymentInfoRepository extends JpaRepository<CompanyPayme
             "SET ci.paymentQRUrl = ?1 " +
             "WHERE ci.companyId = ?2" )
     void updateQRPaymentUrl(String qrPaymentUrl, String companyId);
+
+    CompanyPaymentInfo findByCompanyId(String companyId);
 }

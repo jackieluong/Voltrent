@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum BookingStatus {
     PENDING_PAYMENT("PENDING_PAYMENT"),
     CONFIRMED("CONFIRMED"),
-    CANCELLED("CANCELLED");
+    CANCELLED("CANCELLED"),
+    PENDING_CONFIRMATION("PENDING_CONFIRMATION");
 
     private final String value;
 
