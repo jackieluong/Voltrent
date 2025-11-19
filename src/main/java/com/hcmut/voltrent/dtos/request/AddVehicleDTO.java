@@ -42,9 +42,6 @@ public class AddVehicleDTO {
     @NotNull(message = "Tỉnh/Thành phố không được để trống")
     private String province;
 
-    @NotNull(message = "Quận/Huyện không được để trống")
-    private String district;
-
     @NotNull(message = "Phường/Xã không được để trống")
     private String ward;
 

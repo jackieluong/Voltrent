@@ -4,6 +4,7 @@ import com.hcmut.voltrent.constant.VehicleType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
 
 import java.util.UUID;
@@ -17,8 +18,8 @@ import java.util.UUID;
       @Index(name = "idx_type", columnList = "type"),
       @Index(name = "idx_price", columnList = "pricePerHour"),
       @Index(name = "idx_owner", columnList = "owner_id"),
+      @Index(name = "idx_status", columnList = "status"),
       @Index(name = "idx_province", columnList = "province"),
-      @Index(name = "idx_district", columnList = "district"),
       @Index(name = "idx_ward", columnList = "ward"),
       @Index(name = "idx_address", columnList = "address")
     })
@@ -53,6 +54,11 @@ public class Vehicle extends BaseEntity {
   @Column(nullable = false)
   private VehicleType type;
 
+
+  @Column(nullable = false, name = "is_paused")
+  @ColumnDefault("false")
+  private boolean isPaused;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private VehicleStatus status;
@@ -64,9 +70,6 @@ public class Vehicle extends BaseEntity {
 
   @Column(name = "province")
   private String province;
-
-  @Column(name = "district")
-  private String district;
 
   @Column(name = "ward")
   private String ward;
