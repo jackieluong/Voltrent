@@ -180,10 +180,8 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         Booking booking = bookingRepository.findById(Long.valueOf(bookingId))
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        String userId = SecurityUtil.getCurrentUserLogin()
-                .orElseThrow(() -> new IllegalStateException("No logged in user"));
-
-        BaseBankAccountResponse bankAccountResponse = bankAccountService.getBankAccount(userId);
+        String ownerId = booking.getVehicle().getOwnerId();
+        BaseBankAccountResponse bankAccountResponse = bankAccountService.getBankAccount(ownerId);
         BankInfo bankInfo = new BankInfo(bankAccountResponse.getAccountName(), bankAccountResponse.getAccountNumber(),
                 bankAccountResponse.getBankCode(), bankAccountResponse.getBankName());
 
