@@ -19,6 +19,10 @@ public class Transaction extends BaseEntity{
     @Column(name = "booking_id", nullable = false)
     private Long bookingId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Booking booking;
+
     @Column(name = "total_amount")
     private double totalAmount;
 
