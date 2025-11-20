@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,9 +20,17 @@ public class DateUtils {
     public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final Logger log = LoggerFactory.getLogger(DateUtils.class);
 
-    public static String convertToLocalDateTimeFormat(String time) throws Exception {
-        LocalDateTime localDateTime = LocalDateTime.parse(time, formatter);
-        return localDateTime.format(formatter);
+    public static LocalDateTime convertToLocalDateTimeFormat(String time) {
+        try {
+            return LocalDateTime.parse(time, formatter);
+        } catch (Exception e) {
+            log.error("Error convert date str {} to {} format: {}", time, DATE_TIME_FORMAT, e.getMessage());
+            return null;
+        }
+    }
+
+    public static long toEpochMilli(LocalDateTime dateTime) {
+        return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     // Convert date string to LocalDateTime at start of day
@@ -44,14 +53,22 @@ public class DateUtils {
 
     public static LocalDate convertToLocalDateFormat(String time) {
         try {
-            return LocalDate.parse(time, dateFormatter);
+            return LocalDate.parse(time);
+        } catch (Exception e) {
+            log.error("Error convert date str {} to {} format: {}", time, DATE_FORMAT, e.getMessage());
+            return null;
+        }
+    }
+
+    public static LocalDate convertToLocalDateFormat(LocalDateTime time) {
+        try {
+            return time.toLocalDate();
         } catch (Exception e) {
             log.error("Error convert date str {} to {} format: {}", time, DATE_FORMAT, e.getMessage());
             return null;
         }
 
     }
-
     public static boolean isDateBeforeNow(String date) throws Exception {
         LocalDate localDate = convertToLocalDateFromDateTime(date);
         return localDate.isBefore(LocalDate.now());

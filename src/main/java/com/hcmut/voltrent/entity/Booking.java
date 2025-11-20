@@ -31,10 +31,10 @@ public class Booking extends BaseEntity {
     private Vehicle vehicle;
 
     @Column(name = "start_time")
-    private LocalDate startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time")
-    private LocalDate endTime;
+    private LocalDateTime endTime;
 
     @Column(name = "total_amount")
     private double totalAmount;

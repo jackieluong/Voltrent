@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -106,6 +107,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
                     " is not available at the given time from " + request.getStartTime() + " to " + request.getEndTime());
         }
 
+        log.info("Vehicle is available");
         String userId = SecurityUtil.getCurrentUserLogin()
                 .orElseThrow(() -> new IllegalStateException("No logged in user"));
 
@@ -117,8 +119,8 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         Booking newBooking = Booking.builder()
                 .user(user)
                 .vehicle(vehicle)
-                .startTime(LocalDate.parse(request.getStartTime()))
-                .endTime(LocalDate.parse(request.getEndTime()))
+                .startTime(DateUtils.convertToLocalDateTimeFormat(request.getStartTime()))
+                .endTime(DateUtils.convertToLocalDateTimeFormat(request.getEndTime()))
                 .status(BookingStatus.PENDING_PAYMENT.getValue())
                 .totalAmount(request.getTotalAmount())
                 .build();
@@ -241,6 +243,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
             throw new RuntimeException("Transfer action " + request.getAction() + " is not supported");
         }
 
+        ConfirmPaymentResponse confirmPaymentResponse;
         if (transferAction.equals(TransferAction.CONFIRM)) {
             log.warn("Transfer action is CONFIRM, process to save new transaction");
             BaseTransactionRequest baseTransactionRequest = new BaseTransactionRequest();
@@ -249,7 +252,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
             BaseTransactionResponse transactionResponse = transactionService.createTransaction(baseTransactionRequest);
             log.info("Confirm payment for booking id {}, set status from {} to {}", bookingId, booking.getStatus(), BookingStatus.CONFIRMED.getValue());
             booking.setStatus(BookingStatus.CONFIRMED.getValue());
-            return ConfirmPaymentResponse.builder()
+            confirmPaymentResponse = ConfirmPaymentResponse.builder()
                     .bookingId(bookingId)
                     .status(BookingStatus.CONFIRMED.getValue())
                     .paymentStatus(PaymentStatus.SUCCESS.getDescription())
@@ -260,13 +263,20 @@ public class BookingService implements IBookingService, CacheExpirationListener<
             log.warn("Transfer action is {}, not saving new transaction", request.getAction());
             log.info("Cancel payment for booking id {}, set status from {} to {}", bookingId, booking.getStatus(), BookingStatus.CANCELLED.getValue());
             booking.setStatus(BookingStatus.CANCELLED.getValue());
-            return ConfirmPaymentResponse.builder()
+            confirmPaymentResponse = ConfirmPaymentResponse.builder()
                     .bookingId(bookingId)
                     .status(BookingStatus.CANCELLED.getValue())
                     .paymentStatus(PaymentStatus.PENDING.getDescription())
                     .transactionId("")
                     .updatedAt(LocalDateTime.now().toString())
                     .build();
+        }
+        try {
+            bookingRepository.save(booking);
+            return confirmPaymentResponse;
+        } catch (Exception e) {
+            log.error("Error update booking {}", booking, e);
+            throw new RuntimeException("Error updating booking");
         }
     }
 
@@ -305,13 +315,15 @@ public class BookingService implements IBookingService, CacheExpirationListener<
     private boolean isVehicleAvailableInTimeRange(String vehicleId, String startTime, String endTime) {
         List<Booking> bookings = bookingRepository.findByVehicleId(Long.valueOf(vehicleId));
 
-        LocalDate bookingStartTime = DateUtils.convertToLocalDateFormat(startTime);
-        LocalDate bookingEndTime = DateUtils.convertToLocalDateFormat(endTime);
-        boolean existOverlap = bookings.stream().anyMatch(booking ->
-                !bookingStartTime.isAfter(booking.getEndTime())
-                        && !bookingEndTime.isBefore(booking.getStartTime())
-                        && !BookingStatus.CANCELLED.getValue().equals(booking.getStatus())
-        );
+        LocalDate bookingStartTime = DateUtils.convertToLocalDateFromDateTime(startTime);
+        LocalDate bookingEndTime = DateUtils.convertToLocalDateFromDateTime(endTime);
+        boolean existOverlap = bookings.stream().anyMatch(booking -> {
+            LocalDate existingEnd = DateUtils.convertToLocalDateFormat(booking.getEndTime());
+            LocalDate existingStart = DateUtils.convertToLocalDateFormat(booking.getStartTime());
+            return !bookingStartTime.isAfter(existingEnd)
+                    && !bookingEndTime.isBefore(existingStart)
+                    && !BookingStatus.CANCELLED.getValue().equals(booking.getStatus());
+        });
         return !existOverlap;
     }
 }
