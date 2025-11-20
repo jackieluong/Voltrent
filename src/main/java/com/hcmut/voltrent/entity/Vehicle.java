@@ -20,6 +20,7 @@ import java.util.UUID;
       @Index(name = "idx_owner", columnList = "owner_id"),
       @Index(name = "idx_status", columnList = "status"),
       @Index(name = "idx_province", columnList = "province"),
+      @Index(name ="idx_price_per_hour", columnList = "pricePerHour"),
       @Index(name = "idx_ward", columnList = "ward"),
       @Index(name = "idx_address", columnList = "address")
     })
