@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "bookings", indexes = {
@@ -43,6 +42,10 @@ public class Booking extends BaseEntity {
     private String status;
 
     private LocalDateTime paymentCompletedTime;
+
+    public String getUserId() {
+        return user.getId();
+    }
 
 
 }
