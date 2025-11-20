@@ -7,7 +7,6 @@ import com.hcmut.voltrent.dtos.request.RegisterRequest;
 import com.hcmut.voltrent.dtos.response.LoginResponse;
 import com.hcmut.voltrent.service.auth.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,32 +24,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
 
         UserDto userDto = authService.register(registerRequest);
 
-       RestResponse restResponse = RestResponse.builder()
-               .code(HttpStatus.OK.value())
-               .message("Register successfully")
-               .data(userDto)
-               .build();
-
-       return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Register successfully", userDto);
 
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
 
         LoginResponse loginResponse = authService.login(loginRequest);
-
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Login successfully")
-                .data(loginResponse)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Login successfully", loginResponse);
     }
 
 }

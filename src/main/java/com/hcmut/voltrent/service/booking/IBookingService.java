@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IBookingService {
 
-    CreateBookingResponse createBooking(CreateBookingRequest request);
+    BaseBookingResponse createBooking(CreateBookingRequest request);
 
     void markBookingAsPaid(Long bookingId, PaymentGateway paymentMethod);
 
@@ -20,4 +20,6 @@ public interface IBookingService {
     ConfirmTransferResponse confirmTransfer(String bookingId);
 
     ConfirmPaymentResponse confirmPayment(String bookingId, ConfirmPaymentRequest request);
+
+    PagedResponse<BookingDetailResponse> getCompanyBookings(int page, int size, String sortBy, String sortDirection);
 }

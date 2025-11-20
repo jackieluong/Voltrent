@@ -25,14 +25,7 @@ public class CompanyController {
     public ResponseEntity<?> createBankAccount(@Valid @RequestBody BaseBankAccountRequest request) {
 
         BaseBankAccountResponse response = bankAccountService.createBankAccount(request);
-
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Create bank account successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Create bank account successfully", response);
     }
 
     @GetMapping("/bank-account")
@@ -40,25 +33,13 @@ public class CompanyController {
         String companyId = SecurityUtil.getCurrentUserLogin()
                 .orElseThrow(() -> new IllegalStateException("No logged in user"));
         BaseBankAccountResponse response = bankAccountService.getBankAccount(companyId);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Get bank account successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Get bank account sucessfully", response);
     }
 
     @PutMapping("/bank-account")
     public ResponseEntity<?> updateCompanyBankAccount(@Valid @RequestBody BaseBankAccountRequest request) {
 
         BaseBankAccountResponse response = bankAccountService.upsertBankAccount(request);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Updating bank account successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Updating bank account successfully", response);
     }
 }

@@ -28,16 +28,8 @@ public class QRController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<RestResponse> generateQR(@Valid @RequestBody CreateQrRequest request) {
-
+    public ResponseEntity<?> generateQR(@Valid @RequestBody CreateQrRequest request) {
         CreateQrResponse response = qrService.generateQr(request);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Create QR successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
-
+        return RestResponse.successResponse("Create QR successfully", response);
     }
 }

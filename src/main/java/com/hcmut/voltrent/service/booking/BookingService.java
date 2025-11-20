@@ -4,16 +4,17 @@ import com.hcmut.voltrent.annotations.Caffeine;
 import com.hcmut.voltrent.constant.*;
 import com.hcmut.voltrent.dtos.model.BankInfo;
 import com.hcmut.voltrent.dtos.model.CacheExpiredEvent;
+import com.hcmut.voltrent.dtos.model.UserDto;
+import com.hcmut.voltrent.dtos.model.VehicleDto;
 import com.hcmut.voltrent.dtos.request.BaseTransactionRequest;
 import com.hcmut.voltrent.dtos.request.ConfirmPaymentRequest;
 import com.hcmut.voltrent.dtos.request.CreateBookingRequest;
 import com.hcmut.voltrent.dtos.response.*;
-import com.hcmut.voltrent.entity.BankAccount;
 import com.hcmut.voltrent.entity.Booking;
+import com.hcmut.voltrent.entity.User;
 import com.hcmut.voltrent.entity.Vehicle;
 import com.hcmut.voltrent.exception.ConflictException;
 import com.hcmut.voltrent.repository.BookingRepository;
-import com.hcmut.voltrent.repository.TransactionRepository;
 import com.hcmut.voltrent.repository.VehicleRepository;
 import com.hcmut.voltrent.security.SecurityUtil;
 import com.hcmut.voltrent.service.bank_account.IBankAccountService;
@@ -24,7 +25,12 @@ import com.hcmut.voltrent.service.transaction.ITransactionService;
 import com.hcmut.voltrent.utils.DateUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -45,17 +51,19 @@ public class BookingService implements IBookingService, CacheExpirationListener<
     private final ICacheService cacheService;
     private final IBankAccountService bankAccountService;
     private final ITransactionService transactionService;
+    private final ModelMapper modelMapper;
 
 
     public BookingService(BookingRepository bookingRepository,
                           VehicleRepository vehicleRepository,
                           @Caffeine ICacheService cacheService,
-                          IBankAccountService bankAccountService, ITransactionService transactionService) {
+                          IBankAccountService bankAccountService, ITransactionService transactionService, ModelMapper modelMapper) {
         this.bookingRepository = bookingRepository;
         this.vehicleRepository = vehicleRepository;
         this.cacheService = cacheService;
         this.bankAccountService = bankAccountService;
         this.transactionService = transactionService;
+        this.modelMapper = modelMapper;
     }
 
     @PostConstruct
@@ -89,7 +97,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
     }
 
     @Override
-    public CreateBookingResponse createBooking(CreateBookingRequest request) {
+    public BaseBookingResponse createBooking(CreateBookingRequest request) {
 
         if (!isVehicleAvailableInTimeRange(request.getVehicleId(), request.getStartTime(), request.getEndTime())) {
             log.warn("Vehicle with id {} is not available from {} to {}", request.getVehicleId(),
@@ -104,8 +112,10 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         Vehicle vehicle = vehicleRepository.findById(Long.valueOf(request.getVehicleId()))
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
+        User user = new User();
+        user.setId(userId);
         Booking newBooking = Booking.builder()
-                .userId(userId)
+                .user(user)
                 .vehicle(vehicle)
                 .startTime(LocalDate.parse(request.getStartTime()))
                 .endTime(LocalDate.parse(request.getEndTime()))
@@ -115,7 +125,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
 
         try {
             Booking saved = bookingRepository.save(newBooking);
-            CreateBookingResponse response = CreateBookingResponse.builder()
+            BaseBookingResponse response = BaseBookingResponse.builder()
                     .bookingId(String.valueOf(saved.getId()))
                     .vehicleId(String.valueOf(saved.getVehicle().getId()))
                     .totalAmount(request.getTotalAmount())
@@ -258,6 +268,37 @@ public class BookingService implements IBookingService, CacheExpirationListener<
                     .updatedAt(LocalDateTime.now().toString())
                     .build();
         }
+    }
+
+    @Override
+    public PagedResponse<BookingDetailResponse> getCompanyBookings(int page, int size, String sortBy, String sortDirection) {
+
+        Sort.Direction direction = Sort.Direction.fromOptionalString(sortDirection)
+                .orElse(Sort.Direction.ASC);
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        String companyId = SecurityUtil.getCurrentUserLogin()
+                .orElseThrow(() -> new RuntimeException("No logged in user"));
+
+        Page<Booking> bookingPage = bookingRepository.findAllByCompanyId(companyId, pageable);
+
+        Page<BookingDetailResponse> response = bookingPage.map(booking -> {
+            VehicleDto vehicle = modelMapper.map(booking.getVehicle(), VehicleDto.class);
+            UserDto user = modelMapper.map(booking.getUser(), UserDto.class);
+            return BookingDetailResponse.builder()
+                    .bookingId(String.valueOf(booking.getId()))
+                    .vehicle(vehicle)
+                    .renter(user)
+                    .startDate(String.valueOf(booking.getStartTime()))
+                    .endDate(String.valueOf(booking.getEndTime()))
+                    .totalAmount(booking.getTotalAmount())
+                    .status(booking.getStatus())
+                    .build();
+        });
+
+        return new PagedResponse<>(response.getContent(), response.getNumber(), response.getSize(),
+                response.getTotalElements(), response.getTotalPages());
     }
 
 

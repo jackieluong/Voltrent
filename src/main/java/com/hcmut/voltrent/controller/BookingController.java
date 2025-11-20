@@ -3,16 +3,12 @@ package com.hcmut.voltrent.controller;
 import com.hcmut.voltrent.dtos.model.RestResponse;
 import com.hcmut.voltrent.dtos.request.ConfirmPaymentRequest;
 import com.hcmut.voltrent.dtos.request.CreateBookingRequest;
-import com.hcmut.voltrent.dtos.response.ConfirmPaymentResponse;
-import com.hcmut.voltrent.dtos.response.ConfirmTransferResponse;
-import com.hcmut.voltrent.dtos.response.CreateBookingResponse;
-import com.hcmut.voltrent.dtos.response.GetBookingQRInfo;
+import com.hcmut.voltrent.dtos.response.*;
 import com.hcmut.voltrent.exception.ErrorDetails;
 import com.hcmut.voltrent.service.booking.IBookingService;
 import com.hcmut.voltrent.utils.DateUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,52 +41,39 @@ public class BookingController {
             log.error("Error converting {} and {} to {} format", request.getStartTime(), request.getEndTime(), DateUtils.DATE_FORMAT, e);
         }
 
-        CreateBookingResponse response = bookingService.createBooking(request);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Create booking successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
-
+        BaseBookingResponse response = bookingService.createBooking(request);
+        return RestResponse.successResponse("Create booking successfully", response);
     }
 
     @GetMapping("/{id}/qr-info")
     public ResponseEntity<?> getBookingQRInfo(@PathVariable(name = "id") String bookingId) {
         GetBookingQRInfo response = bookingService.getQRInfo(bookingId);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Get booking qr successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Get booking QR info successfully", response);
     }
 
     @PostMapping("/{id}/confirm-transfer")
     public ResponseEntity<?> confirmBookingTransfer(@PathVariable(name = "id") String bookingId) {
         ConfirmTransferResponse response = bookingService.confirmTransfer(bookingId);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Confirm transfer successfully")
-                .data(response)
-                .build();
 
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Confirm transfer successfully", response);
     }
 
     @PostMapping("/{id}/confirm-payment")
     public ResponseEntity<?> confirmPaymentTransfer(@PathVariable(name = "id") String bookingId,
                                                     @Valid @RequestBody ConfirmPaymentRequest request) {
         ConfirmPaymentResponse response = bookingService.confirmPayment(bookingId, request);
-        RestResponse restResponse = RestResponse.builder()
-                .code(HttpStatus.OK.value())
-                .message("Confirm payment successfully")
-                .data(response)
-                .build();
-
-        return ResponseEntity.ok(restResponse);
+        return RestResponse.successResponse("Confirm payment successfully", response);
     }
 
+    @GetMapping("/company")
+    public ResponseEntity<?> getCompanyBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
+        PagedResponse<BookingDetailResponse> response =
+                bookingService.getCompanyBookings(page, size, sortBy, sortDirection);
+
+        return RestResponse.successResponse( "Get company bookings successfully", response);
+    }
 }

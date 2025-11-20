@@ -1,14 +1,16 @@
 package com.hcmut.voltrent.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Super;
 
 @Getter
 @Setter
-@Builder
-public class CreateBookingResponse {
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class BaseBookingResponse {
     @JsonProperty("booking_id")
     private String bookingId;
     @JsonProperty("vehicle_id")
