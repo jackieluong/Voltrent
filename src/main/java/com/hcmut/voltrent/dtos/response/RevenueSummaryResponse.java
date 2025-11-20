@@ -12,6 +12,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RevenueSummaryResponse {
+    private Date startDate;
+    private Date endDate;
     private Long totalRevenue;
     private Long totalCommission;
     private Long totalOwnerReceived;
