@@ -19,13 +19,27 @@ public class DateUtils {
     public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final Logger log = LoggerFactory.getLogger(DateUtils.class);
 
-    public static String convertToLocalDateTimeFormat(String time) throws Exception{
+    public static String convertToLocalDateTimeFormat(String time) throws Exception {
         LocalDateTime localDateTime = LocalDateTime.parse(time, formatter);
         return localDateTime.format(formatter);
     }
+
     // Convert date string to LocalDateTime at start of day
     public static LocalDate convertToLocalDateFormatWithEx(String time) throws Exception {
         return LocalDate.parse(time, dateFormatter);
+    }
+
+    public static LocalDate convertToLocalDateFromDateTimeWithEx(String dateTimeStr) throws Exception {
+        return LocalDateTime.parse(dateTimeStr, formatter).toLocalDate();
+    }
+
+    public static LocalDate convertToLocalDateFromDateTime(String dateTimeStr) {
+        try {
+            return LocalDateTime.parse(dateTimeStr, formatter).toLocalDate();
+        } catch (Exception e) {
+            log.error("Error convert date str {} to {} format: {}", dateTimeStr, DATE_FORMAT, e.getMessage());
+            return null;
+        }
     }
 
     public static LocalDate convertToLocalDateFormat(String time) {
@@ -39,13 +53,13 @@ public class DateUtils {
     }
 
     public static boolean isDateBeforeNow(String date) throws Exception {
-        LocalDate localDate = convertToLocalDateFormat(date);
+        LocalDate localDate = convertToLocalDateFromDateTime(date);
         return localDate.isBefore(LocalDate.now());
     }
 
     public static boolean isTimeRangeInvalid(String startTime, String endTime) throws Exception {
-        LocalDate start = convertToLocalDateFormat(startTime);
-        LocalDate end = convertToLocalDateFormat(endTime);
+        LocalDate start = convertToLocalDateFromDateTime(startTime);
+        LocalDate end = convertToLocalDateFromDateTime(endTime);
         return start.isAfter(end);
     }
 

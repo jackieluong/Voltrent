@@ -35,8 +35,8 @@ public class BookingController {
                 return ResponseEntity.badRequest().body(
                         new ErrorDetails(new Date(), "Invalid Time Range", ""));
             }
-            request.setStartTime(String.valueOf(DateUtils.convertToLocalDateFormatWithEx(startTime)));
-            request.setEndTime(String.valueOf(DateUtils.convertToLocalDateFormatWithEx(endTime)));
+            request.setStartTime(String.valueOf(DateUtils.convertToLocalDateFromDateTimeWithEx(startTime)));
+            request.setEndTime(String.valueOf(DateUtils.convertToLocalDateFromDateTimeWithEx(endTime)));
         } catch (Exception e) {
             log.error("Error converting {} and {} to {} format", request.getStartTime(), request.getEndTime(), DateUtils.DATE_FORMAT, e);
         }
