@@ -114,6 +114,15 @@ public class BookingService implements IBookingService, CacheExpirationListener<
         Vehicle vehicle = vehicleRepository.findById(Long.valueOf(request.getVehicleId()))
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
+        if (vehicle.isPaused()) {
+            log.warn("Vehicle with id {} is paused and cannot be booked.", request.getVehicleId());
+            throw new ConflictException("Vehicle with id " + request.getVehicleId() + " is currently paused and cannot be booked.");
+        }
+        if (DateUtils.convertToLocalDateTimeFormat(request.getEndTime()).isBefore(DateUtils.convertToLocalDateTimeFormat(request.getStartTime()))) {
+            log.warn("End time {} is before start time {}", request.getEndTime(), request.getStartTime());
+            throw new ConflictException("End time cannot be before start time.");
+        }
+
         User user = new User();
         user.setId(userId);
         Booking newBooking = Booking.builder()
