@@ -42,6 +42,8 @@ public class ReportService implements IReportService {
         Long totalBookings = bookingRepository.countByOwnerAndDateRange(ownerId, startDate.toInstant(), endDate.toInstant());
 
         return RevenueSummaryResponse.builder()
+                .startDate(startDate)
+                .endDate(endDate)
                 .totalRevenue(totalRevenue)
                 .totalCommission(totalCommission)
                 .totalOwnerReceived(totalOwnerReceived)
