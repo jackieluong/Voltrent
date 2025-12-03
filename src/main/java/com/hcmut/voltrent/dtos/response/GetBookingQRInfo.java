@@ -8,10 +8,9 @@ import lombok.Setter;
 @Setter
 public class GetBookingQRInfo {
     private String bookingId;
-    private double amount;
+    private String amount;
     private BankInfo bankInfo;
     private String transferContent;
     private String note;
     private String template;
-
 }
