@@ -20,4 +20,9 @@ public class StringUtils {
     public static String nullToEmptyString(String input) {
         return nullToDefaultString(input, "");
     }
+
+    public static String formatDoubleAmount(double amount){
+        return String.format("%.2f", amount);
+    }
+
 }

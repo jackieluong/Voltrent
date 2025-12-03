@@ -23,6 +23,7 @@ import com.hcmut.voltrent.service.cache.CaffeineCacheService;
 import com.hcmut.voltrent.service.cache.ICacheService;
 import com.hcmut.voltrent.service.transaction.ITransactionService;
 import com.hcmut.voltrent.utils.DateUtils;
+import com.hcmut.voltrent.utils.StringUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -199,7 +200,7 @@ public class BookingService implements IBookingService, CacheExpirationListener<
 
         GetBookingQRInfo bookingQRInfo = new GetBookingQRInfo();
         bookingQRInfo.setBookingId(bookingId);
-        bookingQRInfo.setAmount(booking.getTotalAmount());
+        bookingQRInfo.setAmount(StringUtils.formatDoubleAmount(booking.getTotalAmount()));
         bookingQRInfo.setBankInfo(bankInfo);
         bookingQRInfo.setTransferContent("XM" + bookingId + " " + booking.getTotalAmount());
         bookingQRInfo.setTemplate("compact");
